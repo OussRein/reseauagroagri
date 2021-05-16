@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "376224266681",
+    "firebase_url": "https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "shopapp-b51c4",
+    "storage_bucket": "shopapp-b51c4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376224266681:android:85add478d2b366870c9e68",
+        "android_client_info": {
+          "package_name": "com.example.reseau_agroagri_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "376224266681-ul4o9nu5npek9d6s9hak409nknttv6ie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHSdqdwmV2-AW7U9ZBOcXGLUPcz9_hp8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "376224266681-ul4o9nu5npek9d6s9hak409nknttv6ie.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376224266681:android:ad7b33868165bb960c9e68",
+        "android_client_info": {
+          "package_name": "com.example.shopping_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "376224266681-ul4o9nu5npek9d6s9hak409nknttv6ie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHSdqdwmV2-AW7U9ZBOcXGLUPcz9_hp8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "376224266681-ul4o9nu5npek9d6s9hak409nknttv6ie.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

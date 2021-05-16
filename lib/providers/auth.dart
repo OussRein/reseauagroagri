@@ -12,7 +12,7 @@ class Auth with ChangeNotifier {
   DateTime _experationDate;
   String _userId;
   Timer _authTimer;
-  
+
   bool get isAuth {
     return token != null;
   }

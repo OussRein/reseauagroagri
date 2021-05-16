@@ -1,7 +1,6 @@
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:reseau_agroagri_app/providers/auth.dart';
 import 'dart:convert';
 
 import '../models/product.dart';
@@ -18,17 +17,23 @@ class ProductProvider with ChangeNotifier {
   }
 
   List<Product> get demandes {
-    return _products.where((element) => element.type == TypeOfProduct.Demande).toList();
+    return _products
+        .where((element) => element.type == TypeOfProduct.Demande)
+        .toList();
   }
 
   List<Product> get offres {
-    return _products.where((element) => element.type == TypeOfProduct.Offre).toList();
+    return _products
+        .where((element) => element.type == TypeOfProduct.Offre)
+        .toList();
   }
 
   Future<void> fetchProducts([bool filterByUser = false]) async {
     try {
-      String filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$_userId"' : '';
-      final url = Uri.parse('https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$_authToken&$filterString');
+      String filterString =
+          filterByUser ? 'orderBy="creatorId"&equalTo="$_userId"' : '';
+      final url = Uri.parse(
+          'https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$_authToken&$filterString');
       var response = await http.get(url);
       final data = json.decode(response.body);
       List<Product> products = [];
@@ -40,13 +45,15 @@ class ProductProvider with ChangeNotifier {
           description: productData['description'],
           imageUrl: productData['imageUrl'],
           price: productData['price'],
-          type: productData['type'] == 'Demande' ? TypeOfProduct.Demande : TypeOfProduct.Offre,
+          type: productData['type'] == 'Demande'
+              ? TypeOfProduct.Demande
+              : TypeOfProduct.Offre,
           creatorId: productData['creatorId'],
         ));
       });
       _products = products;
       notifyListeners();
-   } catch (error) {
+    } catch (error) {
       print(error);
       return error;
     }
@@ -54,12 +61,11 @@ class ProductProvider with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     try {
+      final url = Uri.parse(
+          'https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$_authToken');
 
-      final url = Uri.parse('https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$_authToken');
-      
       product.creatorIdValue = _userId;
-      var response = await http.post(url,
-          body: json.encode(product));
+      var response = await http.post(url, body: json.encode(product));
 
       var newProduct = Product(
         id: json.decode(response.body)['name'],
@@ -77,28 +83,25 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateProduct(Product product) async{
-
-    final url = Uri.parse('https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json?auth=$_authToken');
+  Future<void> updateProduct(Product product) async {
+    final url = Uri.parse(
+        'https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json?auth=$_authToken');
 
     try {
       product.creatorIdValue = _userId;
-      await http.patch(url,
-          body: json.encode(product));
+      await http.patch(url, body: json.encode(product));
       final index = _products.indexWhere((element) => element.id == product.id);
       _products[index] = product;
       notifyListeners();
-
     } catch (error) {
       print(error.toString());
       return error;
     }
-    
   }
 
   void deleteProduct(String id) {
-
-    final url = Uri.parse('https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$_authToken');
+    final url = Uri.parse(
+        'https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$_authToken');
 
     final index = _products.indexWhere((element) => element.id == id);
     var product = _products[index];
@@ -108,14 +111,11 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
 
       http.delete(url);
-
     } catch (error) {
       products.insert(index, product);
       notifyListeners();
       return error;
     }
-    
-    
   }
 
   Product findById(String id) {

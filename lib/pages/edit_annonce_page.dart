@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:custom_radio_grouped_button/CustomButtons/ButtonTextStyle.dart';
 import 'package:custom_radio_grouped_button/CustomButtons/CustomRadioButton.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/pickers/upload_image_picker.dart';
 import '../models/product.dart';
 import '../providers/products_provider.dart';
+import 'package:path/path.dart' as path;
 
 class EditAnnoncePage extends StatefulWidget {
   static const String ROUTE = "/edit-product-page";
@@ -15,6 +20,8 @@ class EditAnnoncePage extends StatefulWidget {
 class _EditProductPageState extends State<EditAnnoncePage> {
   final _imageUrlController = TextEditingController();
   final _form = GlobalKey<FormState>();
+  String _annonceImage;
+
 
   Product _product = Product(
     id: null,
@@ -35,6 +42,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
 
   bool _isInit = true;
   bool _isLoading = false;
+  bool _newUrl = false;
 
   @override
   void dispose() {
@@ -42,19 +50,27 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     super.dispose();
   }
 
+  File _userImageFile;
+
+  void _pickedImage(File image) {
+    _userImageFile = image;
+    _newUrl = true;
+  }
+
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
       final productId = ModalRoute.of(context).settings.arguments as String;
       if (productId != null && productId.isNotEmpty) {
         _product = Provider.of<ProductProvider>(context).findById(productId);
         _initValues = {
           'description': _product.description,
-          //'imageUrl': _product.imageUrl,
+          'imageUrl': _product.imageUrl,
           'price': _product.price.toString(),
           'title': _product.title,
           'type': _product.type,
         };
+        _annonceImage = _product.imageUrl;
         _imageUrlController.text = _product.imageUrl;
       }
     }
@@ -62,8 +78,32 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     super.didChangeDependencies();
   }
 
-  void _saveForm() {
+  String url;
+
+  Future uploadImageToFirebase(BuildContext context) async {
+    String fileName = path.basename(_userImageFile.path);
+    final firebaseStorageRef =
+        FirebaseStorage.instance.ref().child('uploads/$fileName');
+    final uploadTask = await firebaseStorageRef.putFile(_userImageFile);
+    final taskSnapshot = uploadTask;
+    await taskSnapshot.ref.getDownloadURL().then(
+      (value) {
+        print("Done: $value");
+        url = value;
+      },
+    );
+  }
+
+  void _saveForm(BuildContext context) async {
     var isValid = _form.currentState.validate();
+    if (_userImageFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ajouter une image!'),
+        ),
+      );
+      return;
+    }
     if (!isValid) return;
     _form.currentState.save();
 
@@ -71,52 +111,113 @@ class _EditProductPageState extends State<EditAnnoncePage> {
       _isLoading = true;
     });
 
-    if (_product.id != null) {
-      Provider.of<ProductProvider>(context, listen: false)
-          .updateProduct(_product)
-          .catchError((error) {
-        showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-                  title: Text("An error occured!"),
-                  content: Text("Problem in sending data!"),
-                  actions: <Widget>[
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                        },
-                        child: Text("Ok!")),
-                  ],
-                ));
-      }).then((value) {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
+    if (_newUrl) {
+      uploadImageToFirebase(context).then((_) {
+        _product = Product(
+          id: _product.id,
+          description: _product.description,
+          imageUrl: url,
+          type: _product.type,
+          price: _product.price,
+          title: _product.title,
+        );
+        print(url);
+        if (_product.id != null) {
+          Provider.of<ProductProvider>(context, listen: false)
+              .updateProduct(_product)
+              .catchError((error) {
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text("An error occured!"),
+                      content: Text("Problem in sending data!"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                            child: Text("Ok!")),
+                      ],
+                    ));
+          }).then((value) {
+            setState(() {
+              _isLoading = false;
+            });
+            Navigator.of(context).pop();
+          });
+        } else {
+          Provider.of<ProductProvider>(context, listen: false)
+              .addProduct(_product)
+              .catchError((error) {
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text("An error occured!"),
+                      content: Text("Problem in sending data!"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                            child: Text("Ok!")),
+                      ],
+                    ));
+          }).then((value) {
+            setState(() {
+              _isLoading = false;
+            });
+            Navigator.of(context).pop();
+          });
+        }
       });
-    } else {
-      Provider.of<ProductProvider>(context, listen: false)
-          .addProduct(_product)
-          .catchError((error) {
-        showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-                  title: Text("An error occured!"),
-                  content: Text("Problem in sending data!"),
-                  actions: <Widget>[
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                        },
-                        child: Text("Ok!")),
-                  ],
-                ));
-      }).then((value) {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
-      });
+    }else {
+      if (_product.id != null) {
+          Provider.of<ProductProvider>(context, listen: false)
+              .updateProduct(_product)
+              .catchError((error) {
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text("An error occured!"),
+                      content: Text("Problem in sending data!"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                            child: Text("Ok!")),
+                      ],
+                    ));
+          }).then((value) {
+            setState(() {
+              _isLoading = false;
+            });
+            Navigator.of(context).pop();
+          });
+        } else {
+          Provider.of<ProductProvider>(context, listen: false)
+              .addProduct(_product)
+              .catchError((error) {
+            showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                      title: Text("An error occured!"),
+                      content: Text("Problem in sending data!"),
+                      actions: <Widget>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                            child: Text("Ok!")),
+                      ],
+                    ));
+          }).then((value) {
+            setState(() {
+              _isLoading = false;
+            });
+            Navigator.of(context).pop();
+          });
+        }
     }
   }
 
@@ -128,7 +229,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.save),
-            onPressed: _saveForm,
+            onPressed: () => _saveForm(context),
           ),
         ],
       ),
@@ -137,12 +238,14 @@ class _EditProductPageState extends State<EditAnnoncePage> {
               child: CircularProgressIndicator(),
             )
           : Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.fromLTRB(20.0,0,20.0,0),
               child: Form(
                 key: _form,
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
+                      UserImagePicker(_pickedImage,_annonceImage),
+                      SizedBox(height: 20,),
                       TextFormField(
                         initialValue: _initValues['title'],
                         decoration: InputDecoration(labelText: "Title"),
@@ -210,56 +313,6 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 20),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                                margin: EdgeInsets.only(right: 20),
-                                height: 100,
-                                width: 100,
-                                decoration:
-                                    BoxDecoration(border: Border.all(width: 1)),
-                                child: _imageUrlController.text.isEmpty
-                                    ? Text("Image is empty!")
-                                    : FittedBox(
-                                        child: Image.network(
-                                          (_imageUrlController.text),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )),
-                            Expanded(
-                                child: TextFormField(
-                              decoration:
-                                  InputDecoration(labelText: 'Image URL'),
-                              keyboardType: TextInputType.url,
-                              textInputAction: TextInputAction.done,
-                              controller: _imageUrlController,
-                              onEditingComplete: () {
-                                setState(() {});
-                              },
-                              onSaved: (value) {
-                                _product = Product(
-                                  id: _product.id,
-                                  description: _product.description,
-                                  imageUrl: value,
-                                  type: _product.type,
-                                  price: _product.price,
-                                  title: _product.title,
-                                );
-                              },
-                              validator: (value) {
-                                if (value.isEmpty)
-                                  return 'Please put an image!';
-                                if (!value.startsWith("http"))
-                                  return 'Enter a valid url!';
-                                return null;
-                              },
-                            )),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -316,14 +369,13 @@ class _EditProductPageState extends State<EditAnnoncePage> {
             ),
       bottomNavigationBar: Container(
         height: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(100))
-        ),
+        decoration:
+            BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(100))),
         margin: EdgeInsets.all(20),
         child: InkWell(
-          onTap: _saveForm,
+          onTap: () => _saveForm(context),
           child: Ink(
-            color:Colors.green,
+            color: Colors.green,
             child: Padding(
               padding: EdgeInsets.only(top: 2.0),
               child: Row(
