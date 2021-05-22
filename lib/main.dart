@@ -9,7 +9,7 @@ import 'pages/login_page.dart';
 import 'pages/mes_annonces_page.dart';
 import 'pages/splash_page.dart';
 import 'providers/auth.dart';
-import 'providers/products_provider.dart';
+import 'providers/annoncess_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async{
@@ -42,9 +42,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (ctx) => Auth(),
         ),
-        ChangeNotifierProxyProvider<Auth, ProductProvider>(
+        ChangeNotifierProxyProvider<Auth, AnnoncesProvider>(
           create: null,
-          update: (ctx, auth, products) => ProductProvider(auth.token,
+          update: (ctx, auth, products) => AnnoncesProvider(auth.token,
               auth.userId, products == null ? [] : products.products),
         ),
        

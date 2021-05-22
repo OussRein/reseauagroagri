@@ -2,24 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'product.g.dart';
+part 'annonce.g.dart';
 
-enum TypeOfProduct {
+enum TypeOfAnnonce {
   @JsonValue("Demande") Demande,
   @JsonValue("Offre") Offre,
 }
 
 @JsonSerializable()
-class Product with ChangeNotifier{
+class Annonce with ChangeNotifier{
   final String id;
   final String title;
   final String description;
   final double price;
   final String imageUrl;
-  TypeOfProduct type;
+  TypeOfAnnonce type;
   String creatorId;
 
-  Product(
+  Annonce(
       {this.id,
       this.title,
       this.description,
@@ -32,7 +32,7 @@ class Product with ChangeNotifier{
     this.creatorId = newCreatorId;
   }
  
-  factory Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
+  factory Annonce.fromJson(Map<String, dynamic> json) => _$AnnonceFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ProductToJson(this);
+  Map<String, dynamic> toJson() => _$AnnonceToJson(this);
 }

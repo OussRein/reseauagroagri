@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../models/product.dart';
+import '../models/annonce.dart';
 import '../pages/annonce_details_page.dart';
 
 class AnnonceItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context, listen: false);
+    final product = Provider.of<Annonce>(context, listen: false);
 
     return GestureDetector(
       onTap: () {

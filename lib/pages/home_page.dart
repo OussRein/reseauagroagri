@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:reseau_agroagri_app/providers/products_provider.dart';
+import 'package:reseau_agroagri_app/providers/annoncess_provider.dart';
 import 'package:reseau_agroagri_app/widgets/annonces_grid.dart';
 import '../widgets/app_drawer.dart';
 
@@ -29,8 +29,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _isLoading = true;
-    Provider.of<ProductProvider>(context, listen: false)
-        .fetchProducts()
+    Provider.of<AnnoncesProvider>(context, listen: false)
+        .fetchAnnonces()
         .then((value) {
           
             setState(() {
@@ -88,8 +88,8 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             )
           : RefreshIndicator(
-              onRefresh: () {return Provider.of<ProductProvider>(context, listen: false)
-                    .fetchProducts();},
+              onRefresh: () {return Provider.of<AnnoncesProvider>(context, listen: false)
+                    .fetchAnnonces();},
               child: AnnoncesGrid(_afficherDemandes,_afficherOffres)),
     );
   }

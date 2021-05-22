@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'edit_annonce_page.dart';
-import '../providers/products_provider.dart';
+import '../providers/annoncess_provider.dart';
 import '../widgets/annonce_list_item.dart';
 import '../widgets/app_drawer.dart';
 
@@ -10,7 +10,7 @@ class MesAnnoncesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<ProductProvider>(context);
+    final products = Provider.of<AnnoncesProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Your Products!"),
@@ -23,10 +23,10 @@ class MesAnnoncesPage extends StatelessWidget {
       ),
       drawer: AppDrawer(),
       body: FutureBuilder(
-        future: Provider.of<ProductProvider>(context, listen: false).fetchProducts(true),
+        future: Provider.of<AnnoncesProvider>(context, listen: false).fetchAnnonces(true),
         builder:  (ctx, future) => RefreshIndicator(
-          onRefresh: () { return Provider.of<ProductProvider>(context, listen: false).fetchProducts(true);},
-            child: Consumer<ProductProvider>(
+          onRefresh: () { return Provider.of<AnnoncesProvider>(context, listen: false).fetchAnnonces(true);},
+            child: Consumer<AnnoncesProvider>(
             builder: (ctx, data, _ ) => Padding(
               padding: const EdgeInsets.all(10),
               child: ListView.builder(

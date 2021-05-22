@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:reseau_agroagri_app/models/product.dart';
+import 'package:reseau_agroagri_app/models/annonce.dart';
 
-import '../providers/products_provider.dart';
+import '../providers/annoncess_provider.dart';
 import 'annonce_item.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class AnnoncesGrid extends StatelessWidget {
 
   AnnoncesGrid(this._afficherDemandes, this._afficherOffres);
 
-  List<Product> typeOfProducts(ProductProvider productsData){
+  List<Annonce> typeOfProducts(AnnoncesProvider productsData){
     if(_afficherDemandes && _afficherOffres) {
       return productsData.products;
     }else if (_afficherOffres){
@@ -24,7 +24,7 @@ class AnnoncesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<ProductProvider>(context);
+    final productsData = Provider.of<AnnoncesProvider>(context);
     final products = typeOfProducts(productsData);
     return GridView.builder(
       padding: const EdgeInsets.all(10),

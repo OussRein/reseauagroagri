@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:custom_radio_grouped_button/CustomButtons/ButtonTextStyle.dart';
 import 'package:custom_radio_grouped_button/CustomButtons/CustomRadioButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:reseau_agroagri_app/pickers/upload_image_picker.dart';
-import '../models/product.dart';
-import '../providers/products_provider.dart';
+import '../models/annonce.dart';
+import '../providers/annoncess_provider.dart';
 import 'package:path/path.dart' as path;
 
 class EditAnnoncePage extends StatefulWidget {
@@ -23,13 +24,13 @@ class _EditProductPageState extends State<EditAnnoncePage> {
   String _annonceImage;
 
 
-  Product _product = Product(
+  Annonce _product = Annonce(
     id: null,
     description: '',
     imageUrl: '',
     price: 0.0,
     title: '',
-    type: TypeOfProduct.Offre,
+    type: TypeOfAnnonce.Offre,
   );
 
   var _initValues = {
@@ -37,7 +38,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     'imageUrl': '',
     'price': '',
     'title': '',
-    'type': TypeOfProduct.Offre,
+    'type': TypeOfAnnonce.Offre,
   };
 
   bool _isInit = true;
@@ -62,7 +63,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     if (_isInit) {
       final productId = ModalRoute.of(context).settings.arguments as String;
       if (productId != null && productId.isNotEmpty) {
-        _product = Provider.of<ProductProvider>(context).findById(productId);
+        _product = Provider.of<AnnoncesProvider>(context).findById(productId);
         _initValues = {
           'description': _product.description,
           'imageUrl': _product.imageUrl,
@@ -113,18 +114,19 @@ class _EditProductPageState extends State<EditAnnoncePage> {
 
     if (_newUrl) {
       uploadImageToFirebase(context).then((_) {
-        _product = Product(
+        _product = Annonce(
           id: _product.id,
           description: _product.description,
           imageUrl: url,
           type: _product.type,
           price: _product.price,
           title: _product.title,
+          creatorId: FirebaseAuth.instance.currentUser.uid,
         );
         print(url);
         if (_product.id != null) {
-          Provider.of<ProductProvider>(context, listen: false)
-              .updateProduct(_product)
+          Provider.of<AnnoncesProvider>(context, listen: false)
+              .updateAnnonce(_product)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -146,8 +148,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
             Navigator.of(context).pop();
           });
         } else {
-          Provider.of<ProductProvider>(context, listen: false)
-              .addProduct(_product)
+          Provider.of<AnnoncesProvider>(context, listen: false)
+              .addAnnonce(_product)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -172,8 +174,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
       });
     }else {
       if (_product.id != null) {
-          Provider.of<ProductProvider>(context, listen: false)
-              .updateProduct(_product)
+          Provider.of<AnnoncesProvider>(context, listen: false)
+              .updateAnnonce(_product)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -195,8 +197,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
             Navigator.of(context).pop();
           });
         } else {
-          Provider.of<ProductProvider>(context, listen: false)
-              .addProduct(_product)
+          Provider.of<AnnoncesProvider>(context, listen: false)
+              .addAnnonce(_product)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -255,7 +257,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                           return null;
                         },
                         onSaved: (value) {
-                          _product = Product(
+                          _product = Annonce(
                             id: _product.id,
                             description: _product.description,
                             imageUrl: _product.imageUrl,
@@ -279,7 +281,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                           return null;
                         },
                         onSaved: (value) {
-                          _product = Product(
+                          _product = Annonce(
                             id: _product.id,
                             description: _product.description,
                             imageUrl: _product.imageUrl,
@@ -295,7 +297,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                         maxLines: 4,
                         keyboardType: TextInputType.multiline,
                         onSaved: (value) {
-                          _product = Product(
+                          _product = Annonce(
                             id: _product.id,
                             description: value,
                             imageUrl: _product.imageUrl,
@@ -326,7 +328,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                             SizedBox(height: 10),
                             CustomRadioButton(
                               enableShape: true,
-                              defaultSelected: TypeOfProduct.Offre,
+                              defaultSelected: TypeOfAnnonce.Offre,
                               width: 150,
                               elevation: 0,
                               horizontal: true,
@@ -337,8 +339,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                                 'Demande',
                               ],
                               buttonValues: [
-                                TypeOfProduct.Offre,
-                                TypeOfProduct.Demande,
+                                TypeOfAnnonce.Offre,
+                                TypeOfAnnonce.Demande,
                               ],
                               buttonTextStyle: ButtonTextStyle(
                                 selectedColor: Colors.white,
@@ -347,7 +349,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                               ),
                               radioButtonValue: (value) {
                                 setState(() {
-                                  _product = Product(
+                                  _product = Annonce(
                                     id: _product.id,
                                     description: _product.description,
                                     imageUrl: _product.imageUrl,
