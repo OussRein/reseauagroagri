@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:firebase_database/firebase_database.dart';
 import '../models/product.dart';
 
 class ProductProvider with ChangeNotifier {
@@ -29,7 +29,30 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<void> fetchProducts([bool filterByUser = false]) async {
-    try {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('products');
+    databaseReference.once().then((DataSnapshot snapshot) {
+      if (snapshot.value == null) return;
+      List<Product> products = [];
+      snapshot.value.forEach((productId, productData) {
+        products.add(Product(
+          id: productId,
+          title: productData['title'],
+          description: productData['description'],
+          imageUrl: productData['imageUrl'],
+          price: productData['price'],
+          type: productData['type'] == 'Demande'
+              ? TypeOfProduct.Demande
+              : TypeOfProduct.Offre,
+          creatorId: productData['creatorId'],
+        ));
+      });
+      _products = products;
+            print('Connected to second database and read $_products');
+            notifyListeners();
+
+    });
+    
+    /*try {
       String filterString =
           filterByUser ? 'orderBy="creatorId"&equalTo="$_userId"' : '';
       final url = Uri.parse(
@@ -56,7 +79,7 @@ class ProductProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       return error;
-    }
+    }*/
   }
 
   Future<void> addProduct(Product product) async {
