@@ -7,24 +7,24 @@ import '../pages/annonce_details_page.dart';
 class AnnonceItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Annonce>(context, listen: false);
+    final annonce = Provider.of<Annonce>(context, listen: false);
 
     return GestureDetector(
       onTap: () {
         Navigator.of(context).pushNamed(
           AnnonceDetailsPage.ROUTE,
-          arguments: product.id,
+          arguments: annonce.id,
         );
       },
       child: GridTile(
         child: Image.network(
-          product.imageUrl,
+          annonce.imageUrl,
           fit: BoxFit.cover,
         ),
         footer: GridTileBar(
           backgroundColor: Colors.blue.shade400.withOpacity(0.5),
           title: Text(
-            product.title,
+            annonce.title,
             style: GoogleFonts.lato(
               textStyle: TextStyle(color: Colors.black),
               fontSize: 16,

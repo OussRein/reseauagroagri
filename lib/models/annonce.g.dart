@@ -1,31 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'product.dart';
+part of 'annonce.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Product _$ProductFromJson(Map<String, dynamic> json) {
-  return Product(
+Annonce _$AnnonceFromJson(Map<String, dynamic> json) {
+  return Annonce(
     id: json['id'] as String,
     title: json['title'] as String,
     description: json['description'] as String,
     price: (json['price'] as num)?.toDouble(),
     imageUrl: json['imageUrl'] as String,
+    reference: json['reference'] as num,
     creatorId: json['creatorId'] as String,
-    type: _$enumDecodeNullable(_$TypeOfProductEnumMap, json['type']),
+    dateCreation: DateTime.parse(json['dateCreation']),
+    type: _$enumDecodeNullable(_$TypeOfAnnonceEnumMap, json['type']),
   );
 }
 
-Map<String, dynamic> _$ProductToJson(Product instance) => <String, dynamic>{
+Map<String, dynamic> _$AnnonceToJson(Annonce instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'description': instance.description,
       'price': instance.price,
       'imageUrl': instance.imageUrl,
+      'reference': instance.reference,
       'creatorId': instance.creatorId,
-      'type': _$TypeOfProductEnumMap[instance.type],
+      'dateCreation' : instance.dateCreation.toIso8601String(),
+      'type': _$TypeOfAnnonceEnumMap[instance.type],
     };
 
 T _$enumDecode<T>(
@@ -60,7 +64,7 @@ T _$enumDecodeNullable<T>(
   return _$enumDecode<T>(enumValues, source, unknownValue: unknownValue);
 }
 
-const _$TypeOfProductEnumMap = {
-  TypeOfProduct.Demande: 'Demande',
-  TypeOfProduct.Offre: 'Offre',
+const _$TypeOfAnnonceEnumMap = {
+  TypeOfAnnonce.Demande: 'Demande',
+  TypeOfAnnonce.Offre: 'Offre',
 };

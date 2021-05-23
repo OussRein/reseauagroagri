@@ -12,28 +12,28 @@ class AnnoncesGrid extends StatelessWidget {
 
   AnnoncesGrid(this._afficherDemandes, this._afficherOffres);
 
-  List<Annonce> typeOfProducts(AnnoncesProvider productsData){
+  List<Annonce> typeOfAnnonces(AnnoncesProvider annoncesData){
     if(_afficherDemandes && _afficherOffres) {
-      return productsData.products;
+      return annoncesData.annonces;
     }else if (_afficherOffres){
-      return productsData.offres;
+      return annoncesData.offres;
     }else {
-      return productsData.demandes;
+      return annoncesData.demandes;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<AnnoncesProvider>(context);
-    final products = typeOfProducts(productsData);
+    final annoncesData = Provider.of<AnnoncesProvider>(context);
+    final annonces = typeOfAnnonces(annoncesData);
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
-        value: products[i],
-        //create: (cntx) => products[i],
+        value: annonces[i],
+        //create: (cntx) => annonces[i],
         child: AnnonceItem(),
       ),
-      itemCount: products.length,
+      itemCount: annonces.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         childAspectRatio: 2/3,
         crossAxisCount: 2,

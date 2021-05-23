@@ -8,14 +8,11 @@ enum AuthMode { LOGIN, SIGNUP, FORGOTPASSWORD }
 
 class AuthPage extends StatelessWidget {
   static const String ROUTE = '/auth';
-  final Map params;
-  final BaseAuth auth;
-  final VoidCallback onSignedIn;
-  AuthPage({this.params, this.auth, this.onSignedIn});
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+    
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     // transformConfig.translate(-10.0);
     return Scaffold(
@@ -75,7 +72,7 @@ class AuthPage extends StatelessWidget {
                   ),
                   Flexible(
                     flex: deviceSize.width > 600 ? 2 : 1,
-                    child: AuthCard(params: this.params,auth: this.auth, onSignedIn: this.onSignedIn,),
+                    child: AuthCard(),
                   ),
                 ],
               ),
@@ -89,10 +86,7 @@ class AuthPage extends StatelessWidget {
 
 class AuthCard extends StatefulWidget {
 
-  final Map params;
-  final BaseAuth auth;
-  final VoidCallback onSignedIn;
-  AuthCard({this.params, this.auth, this.onSignedIn});
+  
   @override
   _AuthCardState createState() => _AuthCardState();
 }
@@ -100,7 +94,7 @@ class AuthCard extends StatefulWidget {
 class _AuthCardState extends State<AuthCard> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.LOGIN;
-  
+  final FireAuth _auth = new FireAuth();
   Map<String, String> _authData = {
     'email': '',
     'password': '',
@@ -138,18 +132,19 @@ class _AuthCardState extends State<AuthCard> {
     });
     try {
       if (_authMode == AuthMode.LOGIN) {
-        userId = await widget.auth.signIn(_authData['email'], _authData['password']);
+        userId = await _auth.signIn(_authData['email'], _authData['password']);
         //await Provider.of<Auth>(context, listen: false).login(_authData['email'], _authData['password']);
       } else if (_authMode == AuthMode.SIGNUP){
-        userId = await widget.auth.signUp(_authData['email'], _authData['password']);
-          widget.auth.sendEmailVerification();
+        userId = await _auth.signUp(_authData['email'], _authData['password']);
+          _auth.sendEmailVerification();
           _showVerifyEmailSentDialog();
         //await Provider.of<Auth>(context, listen: false).signup(_authData['email'], _authData['password']);
       } else {
-          widget.auth.sendPasswordReset(_authData['email']);
+          _auth.sendPasswordReset(_authData['email']);
           _showPasswordEmailSentDialog();
         }
     } catch (error) {
+      print(error.toString());
       var errorMessage = "Authentication failed - ";
       if (error.toString().contains('EMAIL_EXISTS')) {
         errorMessage = "Email already exists";
@@ -172,12 +167,8 @@ class _AuthCardState extends State<AuthCard> {
      if (userId.length > 0 &&
             userId != null &&
             _authMode == AuthMode.LOGIN) {
-          widget.onSignedIn();
         }
-      
-    setState(() {
-      _isLoading = false;
-    });
+
   }
 
   /*void _switchAuthMode() {
@@ -489,9 +480,9 @@ class _AuthCardState extends State<AuthCard> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Verify your account"),
+          title: new Text("Verifier votre compte"),
           content:
-              new Text("Link to verify account has been sent to your email"),
+              new Text("Un lien pour verifier votre compte a été envoyer a votre boite mail"),
           actions: <Widget>[
             new TextButton(
               child: new Text("Dismiss"),

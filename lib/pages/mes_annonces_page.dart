@@ -10,10 +10,10 @@ class MesAnnoncesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<AnnoncesProvider>(context);
+    final annonces = Provider.of<AnnoncesProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Products!"),
+        title: Text("Vos Annonces!"),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
@@ -32,12 +32,12 @@ class MesAnnoncesPage extends StatelessWidget {
               child: ListView.builder(
                 itemBuilder: (_, i) => Column(
                   children: [
-                    UserProductItem(
-                        products.products[i].id, products.products[i].title, products.products[i].imageUrl),
+                    UserAnnonceItem(
+                        annonces.annonces[i].id, annonces.annonces[i].title, annonces.annonces[i].imageUrl),
                     Divider(),
                   ],
                 ),
-                itemCount: products.products.length,
+                itemCount: annonces.annonces.length,
               ),
           ),
             ),

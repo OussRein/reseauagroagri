@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/pages/contact_page.dart';
 import 'pages/annonce_details_page.dart';
 import 'pages/edit_annonce_page.dart';
 import 'pages/home_page.dart';
@@ -44,8 +45,8 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<Auth, AnnoncesProvider>(
           create: null,
-          update: (ctx, auth, products) => AnnoncesProvider(auth.token,
-              auth.userId, products == null ? [] : products.products),
+          update: (ctx, auth, annonces) => AnnoncesProvider(auth.token,
+              auth.userId, annonces == null ? [] : annonces.annonces),
         ),
        
       ],
@@ -94,8 +95,9 @@ class MyApp extends StatelessWidget {
             AnnonceDetailsPage.ROUTE: (ctx) => AnnonceDetailsPage(),
             MesAnnoncesPage.ROUTE: (ctx) => MesAnnoncesPage(),
             EditAnnoncePage.ROUTE: (ctx) => EditAnnoncePage(),
+            ContactPage.ROUTE: (ctx) => ContactPage(),
             /*UserProductPage.ROUTE: (ctx) => UserProductPage(),
-            EditProductPage.ROUTE: (ctx) => EditProductPage(),*/
+            */
           },
         ),
       ),

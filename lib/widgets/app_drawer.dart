@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/pages/contact_page.dart';
 import 'package:reseau_agroagri_app/pages/mes_annonces_page.dart';
 import 'package:reseau_agroagri_app/providers/auth.dart';
 
@@ -74,7 +75,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed('/');
+              Navigator.of(context).pushReplacementNamed(ContactPage.ROUTE);
             },
           ),
           Divider(),

@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/pages/annonce_details_page.dart';
 import '../pages/edit_annonce_page.dart';
 import '../providers/annoncess_provider.dart';
 
-class UserProductItem extends StatelessWidget {
-  final String id;
+class UserAnnonceItem extends StatelessWidget {
+  final String _id;
   final String _title;
   final String _imageUrl;
 
-  UserProductItem(this.id, this._title, this._imageUrl);
+  UserAnnonceItem(this._id, this._title, this._imageUrl);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AnnonceDetailsPage.ROUTE,
+          arguments: _id,
+        );
+      },
       leading: CircleAvatar(
         backgroundImage: NetworkImage(_imageUrl),
       ),
@@ -25,14 +32,14 @@ class UserProductItem extends StatelessWidget {
               icon: Icon(Icons.edit),
               onPressed: () {
                 Navigator.of(context)
-                    .pushNamed(EditAnnoncePage.ROUTE, arguments: id);
+                    .pushNamed(EditAnnoncePage.ROUTE, arguments: _id);
               },
               color: Theme.of(context).primaryColorLight,
             ),
             IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
-                  Provider.of<AnnoncesProvider>(context, listen: false).deleteAnnonce(id);
+                  Provider.of<AnnoncesProvider>(context, listen: false).deleteAnnonce(_id);
                 },
                 color: Theme.of(context).errorColor),
           ],

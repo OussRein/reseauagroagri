@@ -7,11 +7,11 @@ class AnnonceDetailsPage extends StatelessWidget {
   static const String ROUTE = "/product-detail-page";
   @override
   Widget build(BuildContext context) {
-    final productId = ModalRoute.of(context).settings.arguments as String;
-    final product = Provider.of<AnnoncesProvider>(
+    final _annonceId = ModalRoute.of(context).settings.arguments as String;
+    final _annonce = Provider.of<AnnoncesProvider>(
       context,
       listen: false,
-    ).findById(productId);
+    ).findById(_annonceId);
 
     return Scaffold(
       appBar: AppBar(
@@ -20,7 +20,7 @@ class AnnonceDetailsPage extends StatelessWidget {
           color: Colors.black, //change your color here
         ),
         title: Text(
-          product.title,
+          _annonce.title,
           style: GoogleFonts.pacifico(
             textStyle: Theme.of(context).textTheme.headline4,
             fontSize: 25,
@@ -36,7 +36,7 @@ class AnnonceDetailsPage extends StatelessWidget {
               width: double.infinity,
               height: 350,
               child: Image.network(
-                product.imageUrl,
+                _annonce.imageUrl,
                 height: 350,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -50,7 +50,7 @@ class AnnonceDetailsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      product.title,
+                      _annonce.title,
                       style: GoogleFonts.lato(
                         textStyle: Theme.of(context).textTheme.headline4,
                         fontSize: 25,
@@ -62,7 +62,7 @@ class AnnonceDetailsPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          "Ref : ${product.price}",
+                          "Ref : ${_annonce.reference}",
                           style: GoogleFonts.lato(
                             textStyle: Theme.of(context).textTheme.headline4,
                             fontSize: 15,
@@ -75,7 +75,7 @@ class AnnonceDetailsPage extends StatelessWidget {
                         ),
                         Chip(
                           label: Text(
-                            "Prix Unitaire : \$${product.price}",
+                            "Prix Unitaire : \$${_annonce.price}",
                           ),
                           backgroundColor: Theme.of(context).primaryColorLight,
                         ),
@@ -85,7 +85,7 @@ class AnnonceDetailsPage extends StatelessWidget {
                       height: 5,
                     ),
                     Text(
-                      "Date : ${DateTime.now().toString()}",
+                      _annonce.dateCreation == null ? "Date : ${DateTime.now().toString()}" : "Date : ${_annonce.dateCreation.toString()}",
                       style: GoogleFonts.lato(
                         textStyle: Theme.of(context).textTheme.headline4,
                         fontSize: 15,
@@ -113,7 +113,7 @@ class AnnonceDetailsPage extends StatelessWidget {
                     ),
                     children: <TextSpan>[
                       TextSpan(
-                          text: ' ${product.description} ',
+                          text: ' ${_annonce.description} ',
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
                             color: Colors.blue,

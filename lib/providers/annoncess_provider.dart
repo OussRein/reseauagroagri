@@ -12,7 +12,7 @@ class AnnoncesProvider with ChangeNotifier {
 
   AnnoncesProvider(this._authToken, this._userId, this._annonces);
 
-  List<Annonce> get products {
+  List<Annonce> get annonces {
     return [..._annonces];
   }
 
@@ -33,17 +33,19 @@ class AnnoncesProvider with ChangeNotifier {
     databaseReference.once().then((DataSnapshot snapshot) {
       if (snapshot.value == null) return;
       List<Annonce> products = [];
-      snapshot.value.forEach((productId, productData) {
+      snapshot.value.forEach((annonceId, annonceData) {
         products.add(Annonce(
-          id: productId,
-          title: productData['title'],
-          description: productData['description'],
-          imageUrl: productData['imageUrl'],
-          price: productData['price'],
-          type: productData['type'] == 'Demande'
+          id: annonceId,
+          title: annonceData['title'],
+          description: annonceData['description'],
+          imageUrl: annonceData['imageUrl'],
+          price: (annonceData['price'] as num)?.toDouble(),
+          reference: annonceData['reference'],
+          type: annonceData['type'] == 'Demande'
               ? TypeOfAnnonce.Demande
               : TypeOfAnnonce.Offre,
-          creatorId: productData['creatorId'],
+          creatorId: annonceData['creatorId'],
+          dateCreation: DateTime.parse(annonceData['dateCreation']),
         ));
       });
       _annonces = products;
@@ -109,8 +111,11 @@ class AnnoncesProvider with ChangeNotifier {
     }*/
   }
 
-  Future<void> updateAnnonce(Annonce product) async {
-    final url = Uri.parse(
+  Future<void> updateAnnonce(Annonce annonce) async {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('products');
+    databaseReference.update(annonce.toJson());
+    _annonces.add(annonce);
+    /*final url = Uri.parse(
         'https://shopapp-b51c4-default-rtdb.europe-west1.firebasedatabase.app/products/${product.id}.json?auth=$_authToken');
 
     try {
@@ -122,7 +127,7 @@ class AnnoncesProvider with ChangeNotifier {
     } catch (error) {
       print(error.toString());
       return error;
-    }
+    }*/
   }
 
   void deleteAnnonce(String id) {
@@ -138,7 +143,7 @@ class AnnoncesProvider with ChangeNotifier {
 
       http.delete(url);
     } catch (error) {
-      products.insert(index, product);
+      _annonces.insert(index, product);
       notifyListeners();
       return error;
     }

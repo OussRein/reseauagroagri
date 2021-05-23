@@ -16,6 +16,8 @@ class Annonce with ChangeNotifier{
   final String description;
   final double price;
   final String imageUrl;
+  final int reference;
+  final DateTime dateCreation;
   TypeOfAnnonce type;
   String creatorId;
 
@@ -25,6 +27,8 @@ class Annonce with ChangeNotifier{
       this.description,
       this.price,
       this.imageUrl,
+      this.reference,
+      this.dateCreation,
       this.creatorId,
       this.type});
 

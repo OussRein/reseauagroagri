@@ -24,7 +24,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
   String _annonceImage;
 
 
-  Annonce _product = Annonce(
+  Annonce _annonce = Annonce(
     id: null,
     description: '',
     imageUrl: '',
@@ -38,6 +38,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     'imageUrl': '',
     'price': '',
     'title': '',
+    'reference': '',
     'type': TypeOfAnnonce.Offre,
   };
 
@@ -63,16 +64,17 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     if (_isInit) {
       final productId = ModalRoute.of(context).settings.arguments as String;
       if (productId != null && productId.isNotEmpty) {
-        _product = Provider.of<AnnoncesProvider>(context).findById(productId);
+        _annonce = Provider.of<AnnoncesProvider>(context).findById(productId);
         _initValues = {
-          'description': _product.description,
-          'imageUrl': _product.imageUrl,
-          'price': _product.price.toString(),
-          'title': _product.title,
-          'type': _product.type,
+          'description': _annonce.description,
+          'imageUrl': _annonce.imageUrl,
+          'price': _annonce.price.toString(),
+          'title': _annonce.title,
+          'type': _annonce.type,
+          'reference' : _annonce.reference,
         };
-        _annonceImage = _product.imageUrl;
-        _imageUrlController.text = _product.imageUrl;
+        _annonceImage = _annonce.imageUrl;
+        _imageUrlController.text = _annonce.imageUrl;
       }
     }
     _isInit = false;
@@ -114,19 +116,21 @@ class _EditProductPageState extends State<EditAnnoncePage> {
 
     if (_newUrl) {
       uploadImageToFirebase(context).then((_) {
-        _product = Annonce(
-          id: _product.id,
-          description: _product.description,
+        _annonce = Annonce(
+          id: _annonce.id,
+          description: _annonce.description,
           imageUrl: url,
-          type: _product.type,
-          price: _product.price,
-          title: _product.title,
+          type: _annonce.type,
+          price: _annonce.price,
+          title: _annonce.title,
+          reference: _annonce.reference,
           creatorId: FirebaseAuth.instance.currentUser.uid,
+          dateCreation: DateTime.now(),
         );
         print(url);
-        if (_product.id != null) {
+        if (_annonce.id != null) {
           Provider.of<AnnoncesProvider>(context, listen: false)
-              .updateAnnonce(_product)
+              .updateAnnonce(_annonce)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -149,7 +153,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
           });
         } else {
           Provider.of<AnnoncesProvider>(context, listen: false)
-              .addAnnonce(_product)
+              .addAnnonce(_annonce)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -173,15 +177,15 @@ class _EditProductPageState extends State<EditAnnoncePage> {
         }
       });
     }else {
-      if (_product.id != null) {
+      if (_annonce.id != null) {
           Provider.of<AnnoncesProvider>(context, listen: false)
-              .updateAnnonce(_product)
+              .updateAnnonce(_annonce)
               .catchError((error) {
             showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
                       title: Text("An error occured!"),
-                      content: Text("Problem in sending data!"),
+                      content: Text("Problem dans l'envoi des données!"),
                       actions: <Widget>[
                         TextButton(
                             onPressed: () {
@@ -198,7 +202,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
           });
         } else {
           Provider.of<AnnoncesProvider>(context, listen: false)
-              .addAnnonce(_product)
+              .addAnnonce(_annonce)
               .catchError((error) {
             showDialog(
                 context: context,
@@ -257,37 +261,62 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                           return null;
                         },
                         onSaved: (value) {
-                          _product = Annonce(
-                            id: _product.id,
-                            description: _product.description,
-                            imageUrl: _product.imageUrl,
-                            type: _product.type,
-                            price: _product.price,
+                          _annonce = Annonce(
+                            id: _annonce.id,
+                            description: _annonce.description,
+                            imageUrl: _annonce.imageUrl,
+                            type: _annonce.type,
+                            price: _annonce.price,
+                            reference: _annonce.reference,
                             title: value,
                           );
                         },
                       ),
                       TextFormField(
                         initialValue: _initValues['price'],
-                        decoration: InputDecoration(labelText: "Price"),
+                        decoration: InputDecoration(labelText: "Prix"),
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.number,
                         validator: (value) {
-                          if (value.isEmpty) return 'Please put a price!';
+                          if (value.isEmpty) return 'Ajouter un prix!';
                           if (double.tryParse(value) == null)
-                            return 'Please a valid price!';
+                            return 'Ajouter une valeur de prix valide!!';
                           if (double.parse(value) <= 0)
-                            return 'The price must be greater then 0!';
+                            return 'Le prix doit etre supperieur a 0!';
                           return null;
                         },
                         onSaved: (value) {
-                          _product = Annonce(
-                            id: _product.id,
-                            description: _product.description,
-                            imageUrl: _product.imageUrl,
-                            type: _product.type,
+                          _annonce = Annonce(
+                            id: _annonce.id,
+                            description: _annonce.description,
+                            imageUrl: _annonce.imageUrl,
+                            reference: _annonce.reference,
+                            type: _annonce.type,
                             price: double.parse(value),
-                            title: _product.title,
+                            title: _annonce.title,
+                          );
+                        },
+                      ),
+                      TextFormField(
+                        initialValue: _initValues['reference'],
+                        decoration: InputDecoration(labelText: "Reference"),
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value.isEmpty) return 'Ajouter une Reference!';
+                          if (double.parse(value) <= 0)
+                            return 'La valeur de reference doit etre supperieur a 0!';
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _annonce = Annonce(
+                            id: _annonce.id,
+                            description: _annonce.description,
+                            imageUrl: _annonce.imageUrl,
+                            type: _annonce.type,
+                            price: _annonce.price,
+                            reference: int.parse(value),
+                            title: _annonce.title,
                           );
                         },
                       ),
@@ -297,19 +326,20 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                         maxLines: 4,
                         keyboardType: TextInputType.multiline,
                         onSaved: (value) {
-                          _product = Annonce(
-                            id: _product.id,
+                          _annonce = Annonce(
+                            id: _annonce.id,
                             description: value,
-                            imageUrl: _product.imageUrl,
-                            type: _product.type,
-                            price: _product.price,
-                            title: _product.title,
+                            imageUrl: _annonce.imageUrl,
+                            type: _annonce.type,
+                            price: _annonce.price,
+                            reference: _annonce.reference,
+                            title: _annonce.title,
                           );
                         },
                         validator: (value) {
-                          if (value.isEmpty) return 'Please put a description!';
+                          if (value.isEmpty) return 'Ajouter une description!';
                           if (value.length < 10)
-                            return 'Description is too short!';
+                            return 'La description est trop courte!';
                           return null;
                         },
                       ),
@@ -349,13 +379,14 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                               ),
                               radioButtonValue: (value) {
                                 setState(() {
-                                  _product = Annonce(
-                                    id: _product.id,
-                                    description: _product.description,
-                                    imageUrl: _product.imageUrl,
+                                  _annonce = Annonce(
+                                    id: _annonce.id,
+                                    description: _annonce.description,
+                                    imageUrl: _annonce.imageUrl,
                                     type: value,
-                                    price: _product.price,
-                                    title: _product.title,
+                                    price: _annonce.price,
+                                    title: _annonce.title,
+                                    reference: _annonce.reference,
                                   );
                                 });
                               },
