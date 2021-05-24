@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/pages/messages_page.dart';
 import 'package:reseau_agroagri_app/providers/annoncess_provider.dart';
 import 'package:reseau_agroagri_app/widgets/annonces_grid.dart';
 import '../widgets/app_drawer.dart';
@@ -79,6 +80,14 @@ class _HomePageState extends State<HomePage> {
             ],
             icon: Icon(Icons.more_vert),
           ),
+          IconButton(
+              icon: Icon(
+                Icons.message,
+              ),
+              onPressed: () {
+                Navigator.of(context).pushNamed(MassagesPage.ROUTE);
+              },
+            ),
           
         ],
       ),

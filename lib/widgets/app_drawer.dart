@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:reseau_agroagri_app/pages/contact_page.dart';
 import 'package:reseau_agroagri_app/pages/mes_annonces_page.dart';
-import 'package:reseau_agroagri_app/providers/auth.dart';
+import 'package:reseau_agroagri_app/services/base_auth.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -94,7 +93,8 @@ class AppDrawer extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.of(context).pushReplacementNamed('/');
-                  Provider.of<Auth>(context, listen: false).logout();
+                  FireAuth fireAuth = new FireAuth();
+                  fireAuth.signOut();
                 },
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/widgets/contacter_annonceur_box.dart';
 import '../providers/annoncess_provider.dart';
 
 class AnnonceDetailsPage extends StatelessWidget {
@@ -128,38 +129,7 @@ class AnnonceDetailsPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        child: InkWell(
-          onTap: () => print("Contacter l'annonceur"),
-          child: Ink(
-            color: Theme.of(context).primaryColorDark,
-            child: Padding(
-              padding: EdgeInsets.only(top: 2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Icon(
-                      Icons.contacts_sharp,
-                    ),
-                  ),
-                  Text(
-                    "Contacter l'annonceur",
-                    style: GoogleFonts.lato(
-                      textStyle: Theme.of(context).textTheme.headline4,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      bottomNavigationBar: ContacterAnnonceurBox(),
     );
   }
 }
