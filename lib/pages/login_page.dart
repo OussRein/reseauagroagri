@@ -12,7 +12,7 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    
+
     // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
     // transformConfig.translate(-10.0);
     return Scaffold(
@@ -85,8 +85,6 @@ class AuthPage extends StatelessWidget {
 }
 
 class AuthCard extends StatefulWidget {
-
-  
   @override
   _AuthCardState createState() => _AuthCardState();
 }
@@ -96,6 +94,7 @@ class _AuthCardState extends State<AuthCard> {
   AuthMode _authMode = AuthMode.LOGIN;
   final FireAuth _auth = new FireAuth();
   Map<String, String> _authData = {
+    'username' : '',
     'email': '',
     'password': '',
   };
@@ -134,15 +133,15 @@ class _AuthCardState extends State<AuthCard> {
       if (_authMode == AuthMode.LOGIN) {
         userId = await _auth.signIn(_authData['email'], _authData['password']);
         //await Provider.of<Auth>(context, listen: false).login(_authData['email'], _authData['password']);
-      } else if (_authMode == AuthMode.SIGNUP){
-        userId = await _auth.signUp(_authData['email'], _authData['password']);
-          _auth.sendEmailVerification();
-          _showVerifyEmailSentDialog();
+      } else if (_authMode == AuthMode.SIGNUP) {
+        userId = await _auth.signUp(_authData['email'], _authData['password'], _authData['username']);
+        _auth.sendEmailVerification();
+        _showVerifyEmailSentDialog();
         //await Provider.of<Auth>(context, listen: false).signup(_authData['email'], _authData['password']);
       } else {
-          _auth.sendPasswordReset(_authData['email']);
-          _showPasswordEmailSentDialog();
-        }
+        _auth.sendPasswordReset(_authData['email']);
+        _showPasswordEmailSentDialog();
+      }
     } catch (error) {
       print(error.toString());
       var errorMessage = "Authentication failed - ";
@@ -164,11 +163,7 @@ class _AuthCardState extends State<AuthCard> {
       _showErrorDialog(errorMessage);
     }
 
-     if (userId.length > 0 &&
-            userId != null &&
-            _authMode == AuthMode.LOGIN) {
-        }
-
+    if (userId.length > 0 && userId != null && _authMode == AuthMode.LOGIN) {}
   }
 
   /*void _switchAuthMode() {
@@ -213,15 +208,16 @@ class _AuthCardState extends State<AuthCard> {
       ),
       elevation: 8.0,
       child: SingleChildScrollView(
-              child: Padding(
+        child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  _showEmailInput(),
-                  /*TextFormField(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                _showUserNameInput(),
+                _showEmailInput(),
+                /*TextFormField(
                     decoration: InputDecoration(labelText: 'E-Mail'),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
@@ -234,8 +230,8 @@ class _AuthCardState extends State<AuthCard> {
                       _authData['email'] = value;
                     },
                   ),*/
-                  _showPasswordInput(),
-                  /*TextFormField(
+                _showPasswordInput(),
+                /*TextFormField(
                     decoration: InputDecoration(labelText: 'Password'),
                     obscureText: true,
                     controller: _passwordController,
@@ -266,8 +262,8 @@ class _AuthCardState extends State<AuthCard> {
                   SizedBox(
                     height: 20,
                   ),*/
-                  if (_isLoading) CircularProgressIndicator(),
-                  /*else
+                if (_isLoading) CircularProgressIndicator(),
+                /*else
                     ElevatedButton(
                       child:
                           Text(_authMode == AuthMode.LOGIN ? 'LOGIN' : 'SIGN UP'),
@@ -283,10 +279,10 @@ class _AuthCardState extends State<AuthCard> {
                         //padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
                       ),
                     ),*/
-                  _showPrimaryButton(),
-                  _showSecondaryButton(),
-                  _showForgotPasswordButton(),
-                  /*TextButton(
+                _showPrimaryButton(),
+                _showSecondaryButton(),
+                _showForgotPasswordButton(),
+                /*TextButton(
                     child: Text(
                         "${_authMode == AuthMode.LOGIN ? "S'inscrire" : "Se connecter"}"),
                     onPressed: _switchAuthMode,
@@ -302,12 +298,39 @@ class _AuthCardState extends State<AuthCard> {
                       //padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
                     ),
                   ),*/
-                ],
-              ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _showUserNameInput() {
+    if (_authMode != AuthMode.LOGIN) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+        child: new TextFormField(
+          maxLines: 1,
+          keyboardType: TextInputType.emailAddress,
+          autofocus: false,
+          decoration: new InputDecoration(
+              hintText: 'Nom d\'utilisateur',
+              icon: new Icon(
+                Icons.mail,
+                color: Colors.grey,
+              )),
+          validator: (value) {
+            if (value.length < 5 || value.isEmpty) {
+              return 'Le nom d\'utilisateur n\'est pas valide!';
+            } else {
+              return null;
+            }
+          },
+          onSaved: (value) => _authData['username'] = value.trim(),
+        ),
+      );
+    }else return null;
   }
 
   Widget _showEmailInput() {
@@ -324,9 +347,9 @@ class _AuthCardState extends State<AuthCard> {
               color: Colors.grey,
             )),
         validator: (value) {
-          if(!value.contains('@') || value.isEmpty){
+          if (!value.contains('@') || value.isEmpty) {
             return 'L\'addresse n\'est pas valide!';
-          }else{
+          } else {
             return null;
           }
         },
@@ -403,18 +426,16 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Widget _showForgotPasswordButton() {
-    return new TextButton(
-      child: _authMode == AuthMode.LOGIN
-          ? new Text(
-              'Mot de passe oublié?',
-              style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300),
-            )
-          : new Text(
-              '',
-              style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300),
-            ),
-      onPressed: _changeFormToPasswordReset,
-    );
+    if (_authMode == AuthMode.LOGIN) {
+      return new TextButton(
+        onPressed: _changeFormToPasswordReset,
+        child: Text(
+          'Mot de passe oublié?',
+          style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300),
+        ),
+      );
+    } else
+      return null;
   }
 
   Widget _textPrimaryButton() {
@@ -481,8 +502,8 @@ class _AuthCardState extends State<AuthCard> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Verifier votre compte"),
-          content:
-              new Text("Un lien pour verifier votre compte a été envoyer a votre boite mail"),
+          content: new Text(
+              "Un lien pour verifier votre compte a été envoyer a votre boite mail"),
           actions: <Widget>[
             new TextButton(
               child: new Text("Dismiss"),

@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class BaseAuth {
   Future<String> signIn(String email, String password);
 
-  Future<String> signUp(String email, String password);
+  Future<String> signUp(String email, String password, String username);
 
   Future<User> getCurrentUser();
 
@@ -27,16 +27,18 @@ class FireAuth implements BaseAuth {
         email: email, password: password);
 
     User user = authResult.user;
+    
     return user.uid;
     } catch (error){
       return error;
     }
   }
 
-  Future<String> signUp(String email, String password) async {
+  Future<String> signUp(String email, String password, String username) async {
     final UserCredential authResult = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email, password: password);
     User user = authResult.user;
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({'username': username});
     return user.uid;
   }
 
@@ -52,6 +54,12 @@ class FireAuth implements BaseAuth {
   Future<void> sendEmailVerification() async {
     User user = FirebaseAuth.instance.currentUser;
     user.sendEmailVerification();
+  }
+
+  updateEmail(String value) async {
+    User user = FirebaseAuth.instance.currentUser;
+    user.updateEmail(value);
+
   }
 
   Future<bool> isEmailVerified() async {
