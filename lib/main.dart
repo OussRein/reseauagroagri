@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reseau_agroagri_app/pages/contact_page.dart';
 import 'package:reseau_agroagri_app/pages/messages_page.dart';
+import 'package:reseau_agroagri_app/pages/profile_page.dart';
 import 'pages/annonce_details_page.dart';
 import 'pages/edit_annonce_page.dart';
 import 'pages/home_page.dart';
@@ -97,6 +98,7 @@ class MyApp extends StatelessWidget {
             EditAnnoncePage.ROUTE: (ctx) => EditAnnoncePage(),
             ContactPage.ROUTE: (ctx) => ContactPage(),
             MassagesPage.ROUTE: (ctx) => MassagesPage(),
+            ProfilePage.ROUTE: (ctx) => ProfilePage(),
             
           },
         ),

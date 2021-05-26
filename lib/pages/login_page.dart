@@ -94,7 +94,7 @@ class _AuthCardState extends State<AuthCard> {
   AuthMode _authMode = AuthMode.LOGIN;
   final FireAuth _auth = new FireAuth();
   Map<String, String> _authData = {
-    'username' : '',
+    'username': '',
     'email': '',
     'password': '',
   };
@@ -121,6 +121,7 @@ class _AuthCardState extends State<AuthCard> {
   Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
+      print('NOOOOO');
       return;
     }
     String userId = "";
@@ -134,9 +135,8 @@ class _AuthCardState extends State<AuthCard> {
         userId = await _auth.signIn(_authData['email'], _authData['password']);
         //await Provider.of<Auth>(context, listen: false).login(_authData['email'], _authData['password']);
       } else if (_authMode == AuthMode.SIGNUP) {
-        userId = await _auth.signUp(_authData['email'], _authData['password'], _authData['username']);
-        _auth.sendEmailVerification();
-        _showVerifyEmailSentDialog();
+        userId = await _auth.signUp(
+            _authData['email'], _authData['password'], _authData['username']);
         //await Provider.of<Auth>(context, listen: false).signup(_authData['email'], _authData['password']);
       } else {
         _auth.sendPasswordReset(_authData['email']);
@@ -307,8 +307,8 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Widget _showUserNameInput() {
-    if (_authMode != AuthMode.LOGIN) {
-      return Padding(
+    return Offstage(
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
         child: new TextFormField(
           maxLines: 1,
@@ -321,7 +321,7 @@ class _AuthCardState extends State<AuthCard> {
                 color: Colors.grey,
               )),
           validator: (value) {
-            if (value.length < 5 || value.isEmpty) {
+            if ((value.length < 5 || value.isEmpty) && _authMode == AuthMode.SIGNUP) {
               return 'Le nom d\'utilisateur n\'est pas valide!';
             } else {
               return null;
@@ -329,8 +329,9 @@ class _AuthCardState extends State<AuthCard> {
           },
           onSaved: (value) => _authData['username'] = value.trim(),
         ),
-      );
-    }else return null;
+      ),
+      offstage: _authMode != AuthMode.SIGNUP,
+    );
   }
 
   Widget _showEmailInput() {
@@ -426,16 +427,16 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Widget _showForgotPasswordButton() {
-    if (_authMode == AuthMode.LOGIN) {
-      return new TextButton(
+    return Offstage(
+      offstage: _authMode != AuthMode.LOGIN,
+      child: TextButton(
         onPressed: _changeFormToPasswordReset,
         child: Text(
           'Mot de passe oublié?',
           style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.w300),
         ),
-      );
-    } else
-      return null;
+      ),
+    );
   }
 
   Widget _textPrimaryButton() {
@@ -495,7 +496,7 @@ class _AuthCardState extends State<AuthCard> {
     return new Spacer();
   }
 
-  void _showVerifyEmailSentDialog() {
+  /*void _showVerifyEmailSentDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -516,7 +517,7 @@ class _AuthCardState extends State<AuthCard> {
         );
       },
     );
-  }
+  }*/
 
   void _showPasswordEmailSentDialog() {
     showDialog(
