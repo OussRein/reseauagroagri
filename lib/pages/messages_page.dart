@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:reseau_agroagri_app/models/chat.dart';
-import 'package:reseau_agroagri_app/widgets/chat.dart';
+import 'package:reseau_agroagri_app/widgets/chat_widget.dart';
 
 class MassagesPage extends StatefulWidget {
   static const String ROUTE = '/messages-page';
@@ -10,16 +14,35 @@ class MassagesPage extends StatefulWidget {
 }
 
 class _MassagesPageState extends State<MassagesPage> {
-  List<Chat> _chats = [
-    Chat(title: "Jane Russel", dateCreation: "Now"),
-    Chat(title: "Glady's Murphy", dateCreation: "Yesterday"),
-    Chat(title: "Jorge Henry", dateCreation: "31 Mar"),
-    Chat(title: "Philip Fox", dateCreation: "28 Mar"),
-    Chat(title: "Debra Hawkins", dateCreation: "23 Mar"),
-    Chat(title: "Jacob Pena", dateCreation: "17 Mar"),
-    Chat(title: "Andrey Jones", dateCreation: "24 Feb"),
-    Chat(title: "John Wick", dateCreation: "18 Feb"),
-  ];
+  List<Chat> _chats = [];
+  @override
+  void initState() {
+    super.initState();
+    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    final uid = _firebaseAuth.currentUser.uid;
+    
+    Timer.run(() async {
+
+        await fetchChats();
+    });
+  }
+  Future<void> fetchChats() async {
+    final currentUserId = FirebaseAuth.instance.currentUser.uid;
+    await FirebaseFirestore.instance
+        .collection('chats')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        
+          final data = Chat.fromJson(doc.data());
+          print(data);
+          if ((data.sender == currentUserId) ||
+              ((data.reciepient == currentUserId))) {
+            _chats.add(data);
+          }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

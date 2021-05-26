@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -129,7 +130,7 @@ class AnnonceDetailsPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: ContacterAnnonceurBox(),
+      bottomNavigationBar: Offstage(offstage: FirebaseAuth.instance.currentUser.uid == _annonce.creatorId,child: ContacterAnnonceurBox(_annonce.creatorId),),
     );
   }
 }

@@ -1,23 +1,41 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:reseau_agroagri_app/models/chat.dart';
 
 class MessageDetailPage extends StatefulWidget {
+  final String chatId;
+  final String reciever;
+  MessageDetailPage(this.reciever,this.chatId);
+
   @override
   _MessageDetailPageState createState() => _MessageDetailPageState();
 }
 
 class _MessageDetailPageState extends State<MessageDetailPage> {
-  List<ChatMessage> messages = [
-    ChatMessage(messageContent: "Hello, Will", messageType: "receiver"),
-    ChatMessage(messageContent: "How have you been?", messageType: "receiver"),
-    ChatMessage(
-        messageContent: "Hey Kriss, I am doing fine dude. wbu?",
-        messageType: "sender"),
-    ChatMessage(messageContent: "ehhhh, doing OK.", messageType: "receiver"),
-    ChatMessage(
-        messageContent: "Is there any thing wrong?", messageType: "sender"),
-  ];
+  List<ChatMessage> messages = [];
+  @override
+  void initState() {
+    Timer.run(() async {
+      await FirebaseFirestore.instance
+          .collection('chat_messages')
+          .where('chatId', isEqualTo: widget.chatId)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          final data = ChatMessage.fromJson(doc.data());
+          print(data);
+
+          messages.add(data);
+        });
+      }).onError((error, stackTrace) {
+        print(error);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +67,7 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        "Kriss Benwat",
+                        widget.reciever,
                         style: GoogleFonts.lato(
                           textStyle: TextStyle(color: Colors.black),
                           fontSize: 16,
@@ -77,15 +95,13 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
                 padding:
                     EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
                 child: Align(
-                  alignment: (messages[index].messageType == "receiver"
-                      ? Alignment.topLeft
-                      : Alignment.topRight),
+                  alignment: 
+                      Alignment.topRight,
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: (messages[index].messageType == "receiver"
-                          ? Colors.grey.shade200
-                          : Colors.blue[200]),
+                      color: 
+                          Colors.blue[200],
                     ),
                     padding: EdgeInsets.all(10),
                     child: Text(
