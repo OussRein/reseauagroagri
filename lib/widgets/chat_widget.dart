@@ -20,45 +20,6 @@ class _ChatWidgetState extends State<ChatWidget> {
   String reciepient = "";
 
   @override
-  void initState() {
-    
-    Timer.run(() async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.chat.sender)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          final map = new Map<String, dynamic>.from(documentSnapshot.data());
-          sender = map['username'];
-          print(sender);
-        }
-      }).onError((error, stackTrace) {
-        print(error);
-      });
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.chat.reciepient)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        if (documentSnapshot.exists) {
-          final map = new Map<String, dynamic>.from(documentSnapshot.data());
-          reciepient = map['username'];
-          print(reciepient);
-        }
-      }).onError((error, stackTrace) {
-        print(error);
-      });
-      if(FirebaseAuth.instance.currentUser.uid == widget.chat.reciepient){
-        var x = reciepient;
-        reciepient = sender;
-        sender = x;
-      }
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -66,61 +27,104 @@ class _ChatWidgetState extends State<ChatWidget> {
           return MessageDetailPage(reciepient, widget.chat.id);
         }));
       },
-      child: Container(
-        padding: EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(),
-                  SizedBox(
-                    width: 16,
+      child: FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.chat.reciepient)
+            .get(),
+        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          return FutureBuilder(
+            future: FirebaseFirestore.instance
+                .collection('users')
+                .doc(widget.chat.sender)
+                .get(),
+            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot2) {
+              if (snapshot2.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              print(snapshot2.data.data());
+              var map2 = new Map<String, dynamic>.from(snapshot2.data.data());
+              var map = new Map<String, dynamic>.from(snapshot.data.data());
+              if (FirebaseAuth.instance.currentUser.uid ==
+                  widget.chat.reciepient) {
+                var x = map;
+                map = map2;
+                map2 = x;
+              }
+              reciepient = map['username'];
+              sender = map2['username'];
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  border: Border.symmetric(
+                    horizontal: BorderSide(
+                      color: Colors.black38,
+                      width: 1,
+                    ),
                   ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                padding:
+                    EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Row(
                         children: <Widget>[
-                          Text(
-                            sender,
-                            style: GoogleFonts.lato(
-                                        textStyle:
-                                            TextStyle(color: Colors.black87),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                          ),
+                          CircleAvatar(),
                           SizedBox(
-                            height: 6,
+                            width: 16,
                           ),
-                          Text(
-                            reciepient,
-                            style: GoogleFonts.lato(
-                                        textStyle:
-                                            TextStyle(color: Colors.black87),
-                                        fontSize: 16,
-                                        fontStyle: FontStyle.italic,
-                                      ),
+                          Expanded(
+                            child: Container(
+                              color: Colors.transparent,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    reciepient,
+                                    style: GoogleFonts.lato(
+                                      textStyle:
+                                          TextStyle(color: Colors.black87),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 6,
+                                  ),
+                                  Text(
+                                    sender,
+                                    style: GoogleFonts.lato(
+                                      textStyle:
+                                          TextStyle(color: Colors.black87),
+                                      fontSize: 16,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              DateTime.now().toString(),
-              style: TextStyle(
-                fontSize: 8,
-              ),
-            ),
-          ],
-        ),
+                    Text(
+                      DateTime.now().toString(),
+                      style: TextStyle(
+                        fontSize: 8,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

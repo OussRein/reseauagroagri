@@ -15,70 +15,64 @@ class MassagesPage extends StatefulWidget {
 
 class _MassagesPageState extends State<MassagesPage> {
   List<Chat> _chats = [];
-  @override
-  void initState() {
-    super.initState();
-    final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-    final uid = _firebaseAuth.currentUser.uid;
-    
-    Timer.run(() async {
-
-        await fetchChats();
-    });
-  }
-  Future<void> fetchChats() async {
-    final currentUserId = FirebaseAuth.instance.currentUser.uid;
-    await FirebaseFirestore.instance
-        .collection('chats')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        
-          final data = Chat.fromJson(doc.data());
-          print(data);
-          if ((data.sender == currentUserId) ||
-              ((data.reciepient == currentUserId))) {
-            _chats.add(data);
-          }
-      });
-    });
-  }
+  final uid = FirebaseAuth.instance.currentUser.uid;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+        title: Text(
+          "Conversations",
+          style: GoogleFonts.lato(
+            textStyle: TextStyle(color: Colors.black),
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(left: 16, right: 16, top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Conversations",
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(color: Colors.black),
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Divider(),
-            ListView.builder(
-              itemCount: _chats.length,
-              shrinkWrap: true,
-              padding: EdgeInsets.only(top: 16),
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return ChatWidget(chat: _chats[index]);
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('chats')
+                  .where('sender', isEqualTo: uid)
+                  .snapshots(),
+              builder:
+                  (context, AsyncSnapshot<QuerySnapshot> chatSnapshotSender) {
+                return StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('chats')
+                      .where('reciepient', isEqualTo: uid)
+                      .snapshots(),
+                  builder: (context,
+                      AsyncSnapshot<QuerySnapshot> chatSnapshotReciever) {
+                    if (chatSnapshotReciever.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    final chatDocs = chatSnapshotReciever.data.docs;
+                    chatDocs.addAll(chatSnapshotSender.data.docs);
+                    return ListView.builder(
+                      itemCount: chatDocs.length,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.only(top: 16),
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        Chat chat = Chat.fromJson(chatDocs[index].data());
+                        return ChatWidget(chat: chat);
+                      },
+                    );
+                  },
+                );
               },
             ),
           ],

@@ -8,35 +8,13 @@ import 'package:reseau_agroagri_app/models/chat.dart';
 class MessageDetailPage extends StatefulWidget {
   final String chatId;
   final String reciever;
-  MessageDetailPage(this.reciever,this.chatId);
+  MessageDetailPage(this.reciever, this.chatId);
 
   @override
   _MessageDetailPageState createState() => _MessageDetailPageState();
 }
 
 class _MessageDetailPageState extends State<MessageDetailPage> {
-  List<ChatMessage> messages = [];
-  @override
-  void initState() {
-    Timer.run(() async {
-      await FirebaseFirestore.instance
-          .collection('chat_messages')
-          .where('chatId', isEqualTo: widget.chatId)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          final data = ChatMessage.fromJson(doc.data());
-          print(data);
-
-          messages.add(data);
-        });
-      }).onError((error, stackTrace) {
-        print(error);
-      });
-    });
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,73 +61,95 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
           ),
         ),
       ),
-      body: Stack(
-        children: <Widget>[
-          ListView.builder(
-            itemCount: messages.length,
-            shrinkWrap: true,
-            padding: EdgeInsets.only(top: 10, bottom: 10),
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                padding:
-                    EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
-                child: Align(
-                  alignment: 
-                      Alignment.topRight,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: 
-                          Colors.blue[200],
-                    ),
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      messages[index].messageContent,
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(color: Colors.black),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('chat_messages')
+                .where('chatId', isEqualTo: widget.chatId)
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
+              if (chatSnapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              final chatDocs = chatSnapshot.data.docs;
+              return ListView.builder(
+                itemCount: chatDocs.length,
+                shrinkWrap: true,
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (ctx, index) {
+                  ChatMessage chatmessage =
+                      ChatMessage.fromJson(chatDocs[index].data());
+                  print(chatmessage.messageContent);
+                  return Container(
+                    padding: EdgeInsets.only(
+                        left: 14, right: 14, top: 10, bottom: 10),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.blue[200],
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          chatmessage.messageContent,
+                          style: GoogleFonts.lato(
+                            textStyle: TextStyle(color: Colors.black),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           ),
-          Align(
+          Stack(
             alignment: Alignment.bottomLeft,
-            child: Container(
-              padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
-              height: 60,
-              width: double.infinity,
-              color: Colors.white,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                          hintText: "Ecrivez un message...",
-                          hintStyle: TextStyle(color: Colors.black54),
-                          border: InputBorder.none),
-                    ),
+            children: <Widget>[
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                  height: 60,
+                  width: double.infinity,
+                  color: Colors.white,
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                              hintText: "Ecrivez un message...",
+                              hintStyle: TextStyle(color: Colors.black54),
+                              border: InputBorder.none),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      FloatingActionButton(
+                        onPressed: () {},
+                        child: Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        backgroundColor: Colors.blue,
+                        elevation: 0,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  FloatingActionButton(
-                    onPressed: () {},
-                    child: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    backgroundColor: Colors.blue,
-                    elevation: 0,
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
