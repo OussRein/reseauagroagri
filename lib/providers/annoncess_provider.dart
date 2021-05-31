@@ -23,14 +23,16 @@ class AnnoncesProvider with ChangeNotifier {
         .toList();
   }
 
+  
+
   Future<void> fetchAnnonces([bool filterByUser = false]) async {
     DatabaseReference databaseReference =
         FirebaseDatabase.instance.reference().child('products');
     databaseReference.once().then((DataSnapshot snapshot) {
       if (snapshot.value == null) return;
-      List<Annonce> products = [];
+      List<Annonce> annonces = [];
       snapshot.value.forEach((annonceId, annonceData) {
-        products.add(Annonce(
+        annonces.add(Annonce(
           id: annonceId,
           title: annonceData['title'],
           description: annonceData['description'],
@@ -44,7 +46,7 @@ class AnnoncesProvider with ChangeNotifier {
           dateCreation: DateTime.parse(annonceData['dateCreation']),
         ));
       });
-      _annonces = products;
+      _annonces = annonces;
       print('Connected to second database and read $_annonces');
       notifyListeners();
     });

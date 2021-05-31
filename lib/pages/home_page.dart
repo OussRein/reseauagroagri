@@ -12,9 +12,7 @@ enum FilterOptions {
   All,
 }
 
-
 class HomePage extends StatefulWidget {
-
   static const String ROUTE = '/home-page';
 
   @override
@@ -22,10 +20,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   var _afficherDemandes = true;
   var _afficherOffres = true;
   bool _isLoading = false;
+  bool _isSearching;
+  String _searchText = "";
 
   @override
   void initState() {
@@ -33,20 +32,74 @@ class _HomePageState extends State<HomePage> {
     Provider.of<AnnoncesProvider>(context, listen: false)
         .fetchAnnonces()
         .then((value) {
-          
-            setState(() {
-              _isLoading = false;
-            });
+      setState(() {
+        _isLoading = false;
+      });
     });
     super.initState();
   }
-  
+
+  Icon actionIcon = Icon(
+    Icons.search,
+  );
+
+  Widget appBarTitle =
+      Text("ReseauAgroagri.Com", style: GoogleFonts.pacifico(fontSize: 14));
+
+  void _handleSearchStart() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void _handleSearchEnd() {
+    setState(() {
+      this.actionIcon = Icon(
+        Icons.search,
+      );
+      this.appBarTitle =
+          Text("ReseauAgroagri.Com", style: GoogleFonts.pacifico(fontSize: 14));
+      _isSearching = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ReseauAgroagri.Com", style: GoogleFonts.pacifico()),
+        title: appBarTitle,
         actions: [
+          IconButton(
+            icon: this.actionIcon,
+            onPressed: () {
+              setState(() {
+                if (this.actionIcon.icon == Icons.search) {
+                  this.actionIcon = Icon(
+                    Icons.close,
+                  );
+                  this.appBarTitle = TextField(
+                    
+                    onChanged: (value) {
+                      return setState(() {
+                        _searchText = value;
+                      });
+                    },
+                    style: GoogleFonts.lato(
+                      fontSize: 20,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white,
+                    ),
+                    decoration: InputDecoration(
+                        hintText: "Chercher..",
+                        hintStyle: TextStyle(color: Colors.white)),
+                  );
+                  _handleSearchStart();
+                } else {
+                  _handleSearchEnd();
+                }
+              });
+            },
+          ),
           PopupMenuButton(
             onSelected: (FilterOptions filterOptions) {
               setState(() {
@@ -54,11 +107,11 @@ class _HomePageState extends State<HomePage> {
                   //productsData.showFavouritesOnly();
                   _afficherDemandes = true;
                   _afficherOffres = true;
-                } else if (filterOptions == FilterOptions.Demandes){
+                } else if (filterOptions == FilterOptions.Demandes) {
                   //productsData.showAll();
                   _afficherDemandes = true;
                   _afficherOffres = false;
-                }else {
+                } else {
                   _afficherDemandes = false;
                   _afficherOffres = true;
                 }
@@ -81,14 +134,13 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.more_vert),
           ),
           IconButton(
-              icon: Icon(
-                Icons.message,
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed(MassagesPage.ROUTE);
-              },
+            icon: Icon(
+              Icons.message,
             ),
-          
+            onPressed: () {
+              Navigator.of(context).pushNamed(MassagesPage.ROUTE);
+            },
+          ),
         ],
       ),
       drawer: AppDrawer(),
@@ -97,9 +149,12 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             )
           : RefreshIndicator(
-              onRefresh: () {return Provider.of<AnnoncesProvider>(context, listen: false)
-                    .fetchAnnonces();},
-              child: AnnoncesGrid(_afficherDemandes,_afficherOffres)),
+              onRefresh: () {
+                return Provider.of<AnnoncesProvider>(context, listen: false)
+                    .fetchAnnonces();
+              },
+              child: AnnoncesGrid(
+                  _afficherDemandes, _afficherOffres, _searchText)),
     );
   }
 }

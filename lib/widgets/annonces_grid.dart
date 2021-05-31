@@ -9,8 +9,9 @@ class AnnoncesGrid extends StatelessWidget {
 
   final bool _afficherDemandes;
   final bool _afficherOffres;
+  final String filterWord;
 
-  AnnoncesGrid(this._afficherDemandes, this._afficherOffres);
+  AnnoncesGrid(this._afficherDemandes, this._afficherOffres, this.filterWord);
 
   List<Annonce> typeOfAnnonces(AnnoncesProvider annoncesData){
     if(_afficherDemandes && _afficherOffres) {
@@ -25,7 +26,10 @@ class AnnoncesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final annoncesData = Provider.of<AnnoncesProvider>(context);
-    final annonces = typeOfAnnonces(annoncesData);
+    var annonces = typeOfAnnonces(annoncesData);
+    annonces = annonces
+        .where((element) => element.title.toLowerCase().contains(filterWord.toLowerCase()))
+        .toList();
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
