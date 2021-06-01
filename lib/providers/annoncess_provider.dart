@@ -47,7 +47,6 @@ class AnnoncesProvider with ChangeNotifier {
         ));
       });
       _annonces = annonces;
-      print('Connected to second database and read $_annonces');
       notifyListeners();
     });
   }

@@ -1,9 +1,9 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:reseau_agroagri_app/models/chat.dart';
+import '../models/chat.dart';
+import '../widgets/new_message.dart';
 
 class MessageDetailPage extends StatefulWidget {
   final String chatId;
@@ -68,11 +68,28 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
             stream: FirebaseFirestore.instance
                 .collection('chat_messages')
                 .where('chatId', isEqualTo: widget.chatId)
+                .orderBy('dateCreation')
                 .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> chatSnapshot) {
               if (chatSnapshot.connectionState == ConnectionState.waiting) {
                 return Center(
                   child: CircularProgressIndicator(),
+                );
+              }
+              if (!chatSnapshot.hasData) {
+                return Padding(
+                  padding: const EdgeInsets.only(
+                      left: 14, right: 14, top: 10, bottom: 30),
+                  child: Center(
+                    child: Text(
+                      "Aucun message n'a été trouver!",
+                      style: GoogleFonts.lato(
+                        textStyle: TextStyle(color: Colors.black),
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 );
               }
 
@@ -88,13 +105,31 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
                   print(chatmessage.messageContent);
                   return Container(
                     padding: EdgeInsets.only(
-                        left: 14, right: 14, top: 10, bottom: 10),
-                    child: Align(
-                      alignment: Alignment.topRight,
+                        left: 14, right: 14, bottom: 10),
+                    child: chatmessage.creator == FirebaseAuth.instance.currentUser.uid ? Align(
+                       alignment: Alignment.topRight ,
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.blue[200],
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          chatmessage.messageContent,
+                          style: GoogleFonts.lato(
+                            textStyle: TextStyle(color: Colors.black),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                    : Align(
+                       alignment: Alignment.topLeft ,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.grey.shade200,
                         ),
                         padding: EdgeInsets.all(10),
                         child: Text(
@@ -112,45 +147,7 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
               );
             },
           ),
-          Stack(
-            alignment: Alignment.bottomLeft,
-            children: <Widget>[
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Container(
-                  padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                  height: 60,
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                              hintText: "Ecrivez un message...",
-                              hintStyle: TextStyle(color: Colors.black54),
-                              border: InputBorder.none),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      FloatingActionButton(
-                        onPressed: () {},
-                        child: Icon(
-                          Icons.send,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                        backgroundColor: Colors.blue,
-                        elevation: 0,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          NewMessage(widget.chatId),
         ],
       ),
     );

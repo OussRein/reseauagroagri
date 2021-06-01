@@ -116,7 +116,7 @@ class _ContacterAnnonceurBoxState extends State<ContacterAnnonceurBox> {
       chatId: chat.id,
       messageContent: message,
       creator: sender,
-      dateCreation: DateTime.now().toString(),
+      dateCreation: Timestamp.now(),
       read: false,
     );
 

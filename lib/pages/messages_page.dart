@@ -45,6 +45,12 @@ class _MassagesPageState extends State<MassagesPage> {
                   .snapshots(),
               builder:
                   (context, AsyncSnapshot<QuerySnapshot> chatSnapshotSender) {
+                    if (chatSnapshotSender.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
                 return StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('chats')
@@ -58,19 +64,35 @@ class _MassagesPageState extends State<MassagesPage> {
                         child: CircularProgressIndicator(),
                       );
                     }
-
-                    final chatDocs = chatSnapshotReciever.data.docs;
-                    chatDocs.addAll(chatSnapshotSender.data.docs);
-                    return ListView.builder(
-                      itemCount: chatDocs.length,
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(top: 16),
-                      physics: NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        Chat chat = Chat.fromJson(chatDocs[index].data());
-                        return ChatWidget(chat: chat);
-                      },
-                    );
+                    if (!chatSnapshotReciever.hasData && !chatSnapshotSender.hasData) {
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                            left: 14, right: 14, top: 10, bottom: 30),
+                        child: Center(
+                          child: Text(
+                            "Aucun message n'a été trouver!",
+                            style: GoogleFonts.lato(
+                              textStyle: TextStyle(color: Colors.black),
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      final chatDocs = chatSnapshotReciever.data.docs;
+                      if (chatSnapshotSender.data != null)  chatDocs.addAll(chatSnapshotSender.data.docs);
+                      return ListView.builder(
+                        itemCount: chatDocs.length,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(top: 16),
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          Chat chat = Chat.fromJson(chatDocs[index].data());
+                          return ChatWidget(chat: chat);
+                        },
+                      );
+                    }
                   },
                 );
               },

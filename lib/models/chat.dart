@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Chat {
@@ -30,7 +31,7 @@ class ChatMessage {
   String chatId;
   String messageContent;
   String creator;
-  final String dateCreation;
+  final Timestamp dateCreation;
   final bool read;
 
   ChatMessage({
@@ -46,7 +47,7 @@ class ChatMessage {
     chatId: json['chatId'] as String,
     messageContent: json['messageContent'] as String,
     creator: json['creator'] as String,
-    dateCreation: json['dateCreation'] as String,
+    dateCreation: json['dateCreation'] as Timestamp,
     read: json['read'] as bool,
   );
 }
