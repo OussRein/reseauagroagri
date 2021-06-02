@@ -121,14 +121,32 @@ class _HomePageState extends State<HomePage> {
               PopupMenuItem(
                 child: Text("Afficher tout"),
                 value: FilterOptions.All,
+                textStyle: _afficherDemandes == true && _afficherOffres == true
+                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    : null,
+                enabled: _afficherDemandes == true && _afficherOffres == true
+                    ? false
+                    : true,
               ),
               PopupMenuItem(
                 child: Text("Filtrer les Demandes"),
                 value: FilterOptions.Demandes,
+                textStyle: _afficherDemandes == true && _afficherOffres == false
+                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    : null,
+                enabled: _afficherDemandes == true && _afficherOffres == false
+                    ? false
+                    : true,
               ),
               PopupMenuItem(
                 child: Text("Filtrer les Offres"),
                 value: FilterOptions.Offres,
+                textStyle: _afficherDemandes == false && _afficherOffres == false
+                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    : null,
+                enabled: _afficherDemandes == false && _afficherOffres == true
+                    ? false
+                    : true,
               ),
             ],
             icon: Icon(Icons.more_vert),

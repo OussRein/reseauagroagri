@@ -23,7 +23,6 @@ class _EditProductPageState extends State<EditAnnoncePage> {
   final _form = GlobalKey<FormState>();
   String _annonceImage;
 
-
   Annonce _annonce = Annonce(
     id: null,
     description: '',
@@ -71,7 +70,10 @@ class _EditProductPageState extends State<EditAnnoncePage> {
           'price': _annonce.price.toString(),
           'title': _annonce.title,
           'type': _annonce.type,
-          'reference' : _annonce.reference,
+          'reference': _annonce.reference,
+          'dateCreation': _annonce.dateCreation,
+          'creatorId': _annonce.creatorId,
+          'id': _annonce.id,
         };
         _annonceImage = _annonce.imageUrl;
         _imageUrlController.text = _annonce.imageUrl;
@@ -99,7 +101,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
 
   void _saveForm(BuildContext context) async {
     var isValid = _form.currentState.validate();
-    if (_userImageFile == null) {
+    if (_userImageFile == null && _annonce.id == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Ajouter une image!'),
@@ -176,54 +178,54 @@ class _EditProductPageState extends State<EditAnnoncePage> {
           });
         }
       });
-    }else {
+    } else {
       if (_annonce.id != null) {
-          Provider.of<AnnoncesProvider>(context, listen: false)
-              .updateAnnonce(_annonce)
-              .catchError((error) {
-            showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                      title: Text("An error occured!"),
-                      content: Text("Problem dans l'envoi des données!"),
-                      actions: <Widget>[
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(ctx).pop();
-                            },
-                            child: Text("Ok!")),
-                      ],
-                    ));
-          }).then((value) {
-            setState(() {
-              _isLoading = false;
-            });
-            Navigator.of(context).pop();
+        Provider.of<AnnoncesProvider>(context, listen: false)
+            .updateAnnonce(_annonce)
+            .catchError((error) {
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("An error occured!"),
+                    content: Text("Problem dans l'envoi des données!"),
+                    actions: <Widget>[
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                          },
+                          child: Text("Ok!")),
+                    ],
+                  ));
+        }).then((value) {
+          setState(() {
+            _isLoading = false;
           });
-        } else {
-          Provider.of<AnnoncesProvider>(context, listen: false)
-              .addAnnonce(_annonce)
-              .catchError((error) {
-            showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                      title: Text("An error occured!"),
-                      content: Text("Problem in sending data!"),
-                      actions: <Widget>[
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(ctx).pop();
-                            },
-                            child: Text("Ok!")),
-                      ],
-                    ));
-          }).then((value) {
-            setState(() {
-              _isLoading = false;
-            });
-            Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        });
+      } else {
+        Provider.of<AnnoncesProvider>(context, listen: false)
+            .addAnnonce(_annonce)
+            .catchError((error) {
+          showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: Text("An error occured!"),
+                    content: Text("Problem in sending data!"),
+                    actions: <Widget>[
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                          },
+                          child: Text("Ok!")),
+                    ],
+                  ));
+        }).then((value) {
+          setState(() {
+            _isLoading = false;
           });
-        }
+          Navigator.of(context).pop();
+        });
+      }
     }
   }
 
@@ -231,7 +233,14 @@ class _EditProductPageState extends State<EditAnnoncePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Product"),
+        title: Text(
+          _annonce.id == null ? "Deposer une annonce" : "Edit annonce",
+          style: GoogleFonts.lato(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -244,14 +253,16 @@ class _EditProductPageState extends State<EditAnnoncePage> {
               child: CircularProgressIndicator(),
             )
           : Padding(
-              padding: const EdgeInsets.fromLTRB(20.0,0,20.0,0),
+              padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
               child: Form(
                 key: _form,
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      UserImagePicker(_pickedImage,_annonceImage),
-                      SizedBox(height: 20,),
+                      UserImagePicker(_pickedImage, _annonceImage),
+                      SizedBox(
+                        height: 20,
+                      ),
                       TextFormField(
                         initialValue: _initValues['title'],
                         decoration: InputDecoration(labelText: "Title"),
@@ -269,6 +280,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                             price: _annonce.price,
                             reference: _annonce.reference,
                             title: value,
+                            dateCreation: _annonce.dateCreation,
+                            creatorId: _annonce.creatorId,
                           );
                         },
                       ),
@@ -294,11 +307,13 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                             type: _annonce.type,
                             price: double.parse(value),
                             title: _annonce.title,
+                            dateCreation: _annonce.dateCreation,
+                            creatorId: _annonce.creatorId,
                           );
                         },
                       ),
                       TextFormField(
-                        initialValue: _initValues['reference'],
+                        initialValue: _initValues['reference'].toString(),
                         decoration: InputDecoration(labelText: "Reference"),
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.number,
@@ -334,6 +349,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                             price: _annonce.price,
                             reference: _annonce.reference,
                             title: _annonce.title,
+                            dateCreation: _annonce.dateCreation,
+                            creatorId: _annonce.creatorId,
                           );
                         },
                         validator: (value) {
@@ -387,6 +404,8 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                                     price: _annonce.price,
                                     title: _annonce.title,
                                     reference: _annonce.reference,
+                                    dateCreation: _annonce.dateCreation,
+                                    creatorId: _annonce.creatorId,
                                   );
                                 });
                               },

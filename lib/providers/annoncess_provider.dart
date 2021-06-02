@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../models/annonce.dart';
@@ -23,7 +24,35 @@ class AnnoncesProvider with ChangeNotifier {
         .toList();
   }
 
-  
+  List<Annonce> get mesAnnonces {
+    return _annonces
+        .where((element) =>
+            element.creatorId == FirebaseAuth.instance.currentUser.uid)
+        .toList();
+  }
+
+  List<Annonce> get mesDemandes {
+    return _annonces
+        .where((element) =>
+            element.type == TypeOfAnnonce.Demande &&
+            element.creatorId == FirebaseAuth.instance.currentUser.uid)
+        .toList();
+  }
+
+  List<Annonce> get mesOffres {
+    return _annonces
+        .where((element) =>
+            element.type == TypeOfAnnonce.Offre &&
+            element.creatorId == FirebaseAuth.instance.currentUser.uid)
+        .toList();
+  }
+
+  int getNumberOfCurrentUserAnnonces() {
+    return _annonces
+        .where((element) =>
+            element.creatorId == FirebaseAuth.instance.currentUser.uid)
+        .length;
+  }
 
   Future<void> fetchAnnonces([bool filterByUser = false]) async {
     DatabaseReference databaseReference =
@@ -58,11 +87,26 @@ class AnnoncesProvider with ChangeNotifier {
     _annonces.add(annonce);
   }
 
+  String typeOfAnnonce(TypeOfAnnonce typeOfAnnonce) {
+    if (typeOfAnnonce == TypeOfAnnonce.Demande)
+      return 'Demande';
+    else
+      return 'Offre';
+  }
+
   Future<void> updateAnnonce(Annonce annonce) async {
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.reference().child('products');
-    databaseReference.update(annonce.toJson());
-    _annonces.add(annonce);
+    print(annonce.dateCreation);
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .reference()
+        .child('products')
+        .child(annonce.id);
+    databaseReference.child('imageUrl').set(annonce.imageUrl);
+    databaseReference.child('price').set(annonce.price);
+    databaseReference.child('title').set(annonce.title);
+    databaseReference.child('description').set(annonce.description);
+    databaseReference.child('reference').set(annonce.reference);
+    databaseReference.child('type').set(typeOfAnnonce(annonce.type));
+
     final index = _annonces.indexWhere((element) => element.id == annonce.id);
     _annonces[index] = annonce;
     notifyListeners();
