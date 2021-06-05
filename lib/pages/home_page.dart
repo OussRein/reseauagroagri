@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/models/languages.dart';
 import 'package:reseau_agroagri_app/pages/messages_page.dart';
 import 'package:reseau_agroagri_app/providers/annoncess_provider.dart';
 import 'package:reseau_agroagri_app/widgets/annonces_grid.dart';
@@ -119,7 +120,7 @@ class _HomePageState extends State<HomePage> {
             },
             itemBuilder: (_) => [
               PopupMenuItem(
-                child: Text("Afficher tout"),
+                child: Text(Languages.of(context).afficherToutLabel),
                 value: FilterOptions.All,
                 textStyle: _afficherDemandes == true && _afficherOffres == true
                     ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
@@ -129,7 +130,7 @@ class _HomePageState extends State<HomePage> {
                     : true,
               ),
               PopupMenuItem(
-                child: Text("Filtrer les Demandes"),
+                child: Text(Languages.of(context).filterLesDemandesLabel),
                 value: FilterOptions.Demandes,
                 textStyle: _afficherDemandes == true && _afficherOffres == false
                     ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
@@ -139,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                     : true,
               ),
               PopupMenuItem(
-                child: Text("Filtrer les Offres"),
+                child: Text(Languages.of(context).filtrerLesOffresLabel),
                 value: FilterOptions.Offres,
                 textStyle: _afficherDemandes == false && _afficherOffres == false
                     ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)

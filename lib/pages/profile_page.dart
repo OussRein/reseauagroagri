@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:reseau_agroagri_app/models/languages.dart';
 import 'package:reseau_agroagri_app/services/base_auth.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -15,7 +16,6 @@ class ProfilePage extends StatefulWidget {
 
 class ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  
   String username = "";
   TextEditingController _usernameController;
   TextEditingController _emailController;
@@ -25,33 +25,38 @@ class ProfilePageState extends State<ProfilePage>
     super.initState();
     final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     final uid = _firebaseAuth.currentUser.uid;
-    
+
     Timer.run(() async {
- await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) {
-      if (documentSnapshot.exists) {
-        print('Document data: ${documentSnapshot.data()}');
-        final map = new Map<String, dynamic>.from(documentSnapshot.data());
-        print("THIS HEEEEEEEEEEEEREEEEEEEEEEe ${map['username']}");
-         
-        setState(() {
-          username =map['username'];
-          _usernameController = new TextEditingController(text: map['username']);
-        });
-      } else {
-        print('Document does not exist on the database');
-        _usernameController = new TextEditingController(text: 'Document does not exist on the database');
-      }
-    }).onError((error, stackTrace) {print(error);}); });
-    
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          print('Document data: ${documentSnapshot.data()}');
+          final map = new Map<String, dynamic>.from(documentSnapshot.data());
+          print("THIS HEEEEEEEEEEEEREEEEEEEEEEe ${map['username']}");
+
+          setState(() {
+            username = map['username'];
+            _usernameController =
+                new TextEditingController(text: map['username']);
+          });
+        } else {
+          print('Document does not exist on the database');
+          _usernameController = new TextEditingController(
+              text: 'Document does not exist on the database');
+        }
+      }).onError((error, stackTrace) {
+        print(error);
+      });
+    });
+
     _emailController = new TextEditingController(text: fireAuth.getEmail());
   }
+
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
-  
 
   @override
   Widget build(BuildContext context) {
@@ -81,12 +86,13 @@ class ProfilePageState extends State<ProfilePage>
                     Padding(
                       padding: EdgeInsets.only(left: 15.0),
                       child: new Text(
-                        'PROFILE',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22.0,
-                            fontFamily: 'sans-serif-light',
-                            color: Colors.black),
+                        Languages.of(context).profileLabel,
+                        style: GoogleFonts.lato(
+                          textStyle: TextStyle(color: Colors.black),
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                        ),
                       ),
                     )
                   ],
@@ -113,7 +119,8 @@ class ProfilePageState extends State<ProfilePage>
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new Text(
-                                    'Informations Personnelles',
+                                    Languages.of(context)
+                                        .informationPersonellesLabel,
                                     style: GoogleFonts.lato(
                                       textStyle: TextStyle(color: Colors.black),
                                       fontSize: 18,
@@ -143,7 +150,7 @@ class ProfilePageState extends State<ProfilePage>
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new Text(
-                                    'Nom d\'utilisateur',
+                                    Languages.of(context).usernameLabel,
                                     style: GoogleFonts.lato(
                                       textStyle: TextStyle(color: Colors.black),
                                       fontSize: 16,
@@ -179,7 +186,8 @@ class ProfilePageState extends State<ProfilePage>
                                       enabled: !_status,
                                       autofocus: !_status,
                                       controller: _usernameController,
-                                      onChanged: (value) => username = value.trim(),
+                                      onChanged: (value) =>
+                                          username = value.trim(),
                                     ),
                             ),
                           ],
@@ -196,7 +204,7 @@ class ProfilePageState extends State<ProfilePage>
                                 mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   new Text(
-                                    'Email',
+                                    Languages.of(context).emailLabel,
                                     style: GoogleFonts.lato(
                                       textStyle: TextStyle(color: Colors.black),
                                       fontSize: 16,
@@ -250,7 +258,7 @@ class ProfilePageState extends State<ProfilePage>
   void dispose() {
     // Clean up the controller when the Widget is disposed
     myFocusNode.dispose();
-    if(_usernameController != null) _usernameController.clear();
+    if (_usernameController != null) _usernameController.clear();
     _emailController.clear();
     super.dispose();
   }
@@ -268,21 +276,24 @@ class ProfilePageState extends State<ProfilePage>
               child: Container(
                   child: new ElevatedButton(
                 child: new Text(
-                  "Sauvgarder",
+                  Languages.of(context).sauvgarderLabel,
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.green),
-                    shape: MaterialStateProperty.all(
-                      new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(20.0)),
-                    ),),
+                  backgroundColor: MaterialStateProperty.all(Colors.green),
+                  shape: MaterialStateProperty.all(
+                    new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(20.0)),
+                  ),
+                ),
                 onPressed: () {
-                  setState(() {
-                    _status = true;
-                    fireAuth.updateUsername(username);
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  },);
+                  setState(
+                    () {
+                      _status = true;
+                      fireAuth.updateUsername(username);
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                    },
+                  );
                 },
               )),
             ),
@@ -294,7 +305,7 @@ class ProfilePageState extends State<ProfilePage>
               child: Container(
                   child: new ElevatedButton(
                 child: new Text(
-                  "Annuler",
+                  Languages.of(context).annulerLabel,
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ButtonStyle(

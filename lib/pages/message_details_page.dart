@@ -104,44 +104,73 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
                       ChatMessage.fromJson(chatDocs[index].data());
                   print(chatmessage.messageContent);
                   return Container(
-                    padding: EdgeInsets.only(
-                        left: 14, right: 14, bottom: 10),
-                    child: chatmessage.creator == FirebaseAuth.instance.currentUser.uid ? Align(
-                       alignment: Alignment.topRight ,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.blue[200],
-                        ),
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          chatmessage.messageContent,
-                          style: GoogleFonts.lato(
-                            textStyle: TextStyle(color: Colors.black),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                    padding: EdgeInsets.only(left: 14, right: 14, bottom: 10),
+                    child: chatmessage.creator ==
+                            FirebaseAuth.instance.currentUser.uid
+                        ? Align(
+                            alignment: Alignment.topRight,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20)),
+                                    color: Colors.blue[200],
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    chatmessage.messageContent,
+                                    style: GoogleFonts.lato(
+                                      textStyle: TextStyle(color: Colors.black),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  "${chatmessage.dateCreation.toDate().day}/${chatmessage.dateCreation.toDate().month}",
+                                  style: GoogleFonts.lato(
+                                    textStyle: TextStyle(color: Colors.black),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Align(
+                            alignment: Alignment.topLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                               
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20)),
+                                    color: Colors.grey.shade200,
+                                  ),
+                                  padding: EdgeInsets.all(10),
+                                  child: Text(
+                                    chatmessage.messageContent,
+                                    style: GoogleFonts.lato(
+                                      textStyle: TextStyle(color: Colors.black),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                 Text(
+                                  "${chatmessage.dateCreation.toDate().day}/${chatmessage.dateCreation.toDate().month}",
+                                  style: GoogleFonts.lato(
+                                    textStyle: TextStyle(color: Colors.black),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                    )
-                    : Align(
-                       alignment: Alignment.topLeft ,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.grey.shade200,
-                        ),
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          chatmessage.messageContent,
-                          style: GoogleFonts.lato(
-                            textStyle: TextStyle(color: Colors.black),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
                   );
                 },
               );

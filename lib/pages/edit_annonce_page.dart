@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reseau_agroagri_app/models/languages.dart';
 import 'package:reseau_agroagri_app/pickers/upload_image_picker.dart';
 import '../models/annonce.dart';
 import '../providers/annoncess_provider.dart';
@@ -234,7 +235,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _annonce.id == null ? "Deposer une annonce" : "Edit annonce",
+          _annonce.id == null ? Languages.of(context).deposerAnnonceLabel : Languages.of(context).editAnnonceLabel,
           style: GoogleFonts.lato(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -440,7 +441,7 @@ class _EditProductPageState extends State<EditAnnoncePage> {
                     ),
                   ),
                   Text(
-                    "Sauvgarder",
+                    Languages.of(context).sauvgarderLabel,
                     style: GoogleFonts.lato(
                       textStyle: Theme.of(context).textTheme.headline4,
                       fontSize: 25,

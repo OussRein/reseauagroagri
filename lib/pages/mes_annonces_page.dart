@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:reseau_agroagri_app/models/annonce.dart';
+import 'package:reseau_agroagri_app/models/languages.dart';
 import 'edit_annonce_page.dart';
 import '../providers/annoncess_provider.dart';
 import '../widgets/annonce_list_item.dart';
@@ -41,9 +43,15 @@ class _MesAnnoncesPageState extends State<MesAnnoncesPage> {
     var mesAnnonces = typeOfAnnonces(annonces);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Vos Annonces!"),
+        title: Text(
+          Languages.of(context).vosAnnoncesLabel,
+          style: GoogleFonts.lato(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
         actions: [
-          
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -69,30 +77,39 @@ class _MesAnnoncesPageState extends State<MesAnnoncesPage> {
             },
             itemBuilder: (_) => [
               PopupMenuItem(
-                child: Text("Afficher tout"),
+                child: Text(Languages.of(context).afficherToutLabel),
                 value: FilterOptions.All,
                 textStyle: _afficherDemandes == true && _afficherOffres == true
-                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    ? TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        fontSize: 16)
                     : null,
                 enabled: _afficherDemandes == true && _afficherOffres == true
                     ? false
                     : true,
               ),
               PopupMenuItem(
-                child: Text("Filtrer les Demandes"),
+                child: Text(Languages.of(context).filterLesDemandesLabel),
                 value: FilterOptions.Demandes,
                 textStyle: _afficherDemandes == true && _afficherOffres == false
-                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    ? TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        fontSize: 16)
                     : null,
                 enabled: _afficherDemandes == true && _afficherOffres == false
                     ? false
                     : true,
               ),
               PopupMenuItem(
-                child: Text("Filtrer les Offres"),
+                child: Text(Languages.of(context).filtrerLesOffresLabel),
                 value: FilterOptions.Offres,
                 textStyle: _afficherDemandes == false && _afficherOffres == true
-                    ? TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 16)
+                    ? TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        fontSize: 16)
                     : null,
                 enabled: _afficherDemandes == false && _afficherOffres == true
                     ? false
