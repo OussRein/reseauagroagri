@@ -5,7 +5,18 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('Chargement...'),
+        child: Hero(
+          tag: 'logo',
+          child: Container(
+                      height: 200,
+                      
+                      padding:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 40.0),
+                      child: Image(
+                        image: AssetImage('assets/images/logo.png'),
+                      ),
+                    ),
+        ),
       ),
     );
   }

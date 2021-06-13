@@ -16,7 +16,7 @@ class AnnonceDetailsPage extends StatelessWidget {
     ).findById(_annonceId);
 
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
@@ -30,20 +30,51 @@ class AnnonceDetailsPage extends StatelessWidget {
             fontStyle: FontStyle.italic,
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              height: 350,
-              child: Image.network(
-                _annonce.imageUrl,
-                height: 350,
-                width: double.infinity,
-                fit: BoxFit.cover,
+      ),*/
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 350,
+            pinned: true,
+            floating: true,
+            snap: false,
+            title: Text(
+              _annonce.title,
+              style: GoogleFonts.pacifico(
+                textStyle: Theme.of(context).textTheme.headline4,
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
               ),
             ),
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(
+              color: Colors.black, //change your color here
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.none,
+              background: Container(
+                width: double.infinity,
+                height: 350,
+                child: Hero(
+                  tag: _annonce.id,
+                  child: Padding(
+                    padding: EdgeInsets.only(top : MediaQuery.of(context).padding.top + AppBar().preferredSize.height),
+                    child: FadeInImage(
+                      placeholder:
+                          AssetImage('assets/images/Shop_ICON_Final.jpg'),
+                      image: NetworkImage(_annonce.imageUrl),
+                      fit: BoxFit.cover,
+                      height: 350,
+                      width: double.infinity,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SliverList(
+              delegate: SliverChildListDelegate([
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
@@ -87,7 +118,9 @@ class AnnonceDetailsPage extends StatelessWidget {
                       height: 5,
                     ),
                     Text(
-                      _annonce.dateCreation == null ? "Date : ${DateTime.now().toString()}" : "Date : ${_annonce.dateCreation.toString()}",
+                      _annonce.dateCreation == null
+                          ? "Date : ${DateTime.now().toString()}"
+                          : "Date : ${_annonce.dateCreation.toString()}",
                       style: GoogleFonts.lato(
                         textStyle: Theme.of(context).textTheme.headline4,
                         fontSize: 15,
@@ -127,10 +160,13 @@ class AnnonceDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ])),
+        ],
       ),
-      bottomNavigationBar: Offstage(offstage: FirebaseAuth.instance.currentUser.uid == _annonce.creatorId,child: ContacterAnnonceurBox(_annonce.creatorId),),
+      bottomNavigationBar: Offstage(
+        offstage: FirebaseAuth.instance.currentUser.uid == _annonce.creatorId,
+        child: ContacterAnnonceurBox(_annonce.creatorId),
+      ),
     );
   }
 }

@@ -54,7 +54,7 @@ class LanguageFr extends Languages {
   String get informationPersonellesLabel => "Information Personelles";
 
   @override
-  String get sauvgarderLabel => throw "Sauvgarder";
+  String get sauvgarderLabel => "Sauvgarder";
 
   @override
   String get usernameLabel => "Nom d'utilisateur";

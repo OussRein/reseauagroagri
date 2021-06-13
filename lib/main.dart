@@ -106,7 +106,7 @@ class _MyAppState extends State<MyApp> {
           },
           title: 'Shopping app',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+            primarySwatch: Colors.green,
             accentColor: Colors.blueGrey,
             fontFamily: "Railway",
             textTheme: ThemeData.light().textTheme.copyWith(
@@ -143,6 +143,7 @@ class _MyAppState extends State<MyApp> {
                   builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashPage() : AuthPage(),
                 ),*/
           routes: {
+            AuthPage.ROUTE: (ctx) => AuthPage(),
             HomePage.ROUTE: (ctx) => HomePage(),
             AnnonceDetailsPage.ROUTE: (ctx) => AnnonceDetailsPage(),
             MesAnnoncesPage.ROUTE: (ctx) => MesAnnoncesPage(),

@@ -17,9 +17,14 @@ class AnnonceItem extends StatelessWidget {
         );
       },
       child: GridTile(
-        child: Image.network(
-          annonce.imageUrl,
-          fit: BoxFit.cover,
+        child: Hero(
+          tag: annonce.id,
+          child: FadeInImage(
+            placeholder: AssetImage('assets/images/Shop_ICON_Final.jpg'),
+            image: NetworkImage(annonce.imageUrl),
+            fit: BoxFit.cover,
+          ),
+          
         ),
         footer: GridTileBar(
           backgroundColor: Colors.blue.shade400.withOpacity(0.5),
@@ -31,11 +36,6 @@ class AnnonceItem extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.italic,
             ),
-          ),
-          trailing: IconButton(
-            icon: Icon(Icons.info),
-            color: Theme.of(context).accentColor,
-            onPressed: () {},
           ),
         ),
       ),

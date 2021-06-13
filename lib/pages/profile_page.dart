@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:reseau_agroagri_app/models/languages.dart';
 import 'package:reseau_agroagri_app/services/base_auth.dart';
@@ -61,197 +62,191 @@ class ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+        appBar: AppBar(
+          bottomOpacity: 0,
+          elevation: 0,
+          title: Text(
+            Languages.of(context).profileLabel,
+            style: GoogleFonts.lato(
+              textStyle: TextStyle(color: Colors.white),
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
         body: new Container(
-      color: Colors.white,
-      child: new ListView(
-        children: <Widget>[
-          Column(
+          color: Colors.white,
+          child: new ListView(
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 10.0, top: 10.0),
-                child: new Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        size: 20.0,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+              Column(
+                children: <Widget>[
+                  ClipPath(
+                    clipper: WaveClipperTwo(flip: true),
+                    child: Container(
+                      height: 50,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.0),
-                      child: new Text(
-                        Languages.of(context).profileLabel,
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(color: Colors.black),
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Divider(),
-              new Container(
-                color: Color(0xffFFFFFF),
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 25.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 10.0),
-                          child: new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
+                  ),
+                  new Container(
+                    color: Color(0xffFFFFFF),
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 25.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 25.0, right: 25.0, top: 10.0),
+                              child: new Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
-                                  new Text(
-                                    Languages.of(context)
-                                        .informationPersonellesLabel,
-                                    style: GoogleFonts.lato(
-                                      textStyle: TextStyle(color: Colors.black),
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              new Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  _status ? _getEditIcon() : new Container(),
-                                ],
-                              )
-                            ],
-                          )),
-                      Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 25.0),
-                          child: new Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  new Text(
-                                    Languages.of(context).usernameLabel,
-                                    style: GoogleFonts.lato(
-                                      textStyle: TextStyle(color: Colors.black),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )),
-                      Padding(
-                        padding:
-                            EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-                        child: new Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            new Flexible(
-                              child: _status
-                                  ? Text(
-                                      username,
-                                      style: GoogleFonts.lato(
-                                        textStyle:
-                                            TextStyle(color: Colors.black87),
-                                        fontSize: 16,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    )
-                                  : new TextField(
-                                      decoration: const InputDecoration(
-                                        hintText: "Enter Your Name",
-                                      ),
-                                      enabled: !_status,
-                                      autofocus: !_status,
-                                      controller: _usernameController,
-                                      onChanged: (value) =>
-                                          username = value.trim(),
-                                    ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 15.0),
-                          child: new Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  new Text(
-                                    Languages.of(context).emailLabel,
-                                    style: GoogleFonts.lato(
-                                      textStyle: TextStyle(color: Colors.black),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )),
-                      Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 2.0),
-                          child: new Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              new Flexible(
-                                child: _status
-                                    ? Text(
-                                        fireAuth.getEmail(),
+                                  new Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new Text(
+                                        Languages.of(context)
+                                            .informationPersonellesLabel,
                                         style: GoogleFonts.lato(
                                           textStyle:
-                                              TextStyle(color: Colors.black87),
-                                          fontSize: 16,
+                                              TextStyle(color: Colors.black),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
                                           fontStyle: FontStyle.italic,
                                         ),
-                                      )
-                                    : new TextField(
-                                        decoration: const InputDecoration(
-                                            hintText: "Entrer Email"),
-                                        enabled: !_status,
-                                        controller: _emailController,
                                       ),
-                              ),
-                            ],
-                          )),
-                      !_status ? _getActionButtons() : new Container(),
-                    ],
-                  ),
-                ),
-              )
+                                    ],
+                                  ),
+                                  new Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      _status
+                                          ? _getEditIcon()
+                                          : new Container(),
+                                    ],
+                                  )
+                                ],
+                              )),
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 25.0, right: 25.0, top: 25.0),
+                              child: new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: <Widget>[
+                                  new Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new Text(
+                                        Languages.of(context).usernameLabel,
+                                        style: GoogleFonts.lato(
+                                          textStyle:
+                                              TextStyle(color: Colors.black),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: 25.0, right: 25.0, top: 2.0),
+                            child: new Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                new Flexible(
+                                  child: _status
+                                      ? Text(
+                                          username,
+                                          style: GoogleFonts.lato(
+                                            textStyle: TextStyle(
+                                                color: Colors.black87),
+                                            fontSize: 16,
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        )
+                                      : new TextField(
+                                          decoration: const InputDecoration(
+                                            hintText: "Enter Your Name",
+                                          ),
+                                          enabled: !_status,
+                                          autofocus: !_status,
+                                          controller: _usernameController,
+                                          onChanged: (value) =>
+                                              username = value.trim(),
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 25.0, right: 25.0, top: 15.0),
+                              child: new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: <Widget>[
+                                  new Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new Text(
+                                        Languages.of(context).emailLabel,
+                                        style: GoogleFonts.lato(
+                                          textStyle:
+                                              TextStyle(color: Colors.black),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
+                          Padding(
+                              padding: EdgeInsets.only(
+                                  left: 25.0, right: 25.0, top: 2.0),
+                              child: new Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: <Widget>[
+                                  new Flexible(
+                                    child: _status
+                                        ? Text(
+                                            fireAuth.getEmail(),
+                                            style: GoogleFonts.lato(
+                                              textStyle: TextStyle(
+                                                  color: Colors.black87),
+                                              fontSize: 16,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          )
+                                        : new TextField(
+                                            decoration: const InputDecoration(
+                                                hintText: "Entrer Email"),
+                                            enabled: !_status,
+                                            controller: _emailController,
+                                          ),
+                                  ),
+                                ],
+                              )),
+                          !_status ? _getActionButtons() : new Container(),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
   @override
