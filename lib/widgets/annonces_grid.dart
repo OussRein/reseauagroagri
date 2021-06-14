@@ -42,7 +42,7 @@ class AnnoncesGrid extends StatelessWidget {
         childAspectRatio: 2/3,
         crossAxisCount: 2,
         crossAxisSpacing: 10,
-        mainAxisExtent: 200,
+        mainAxisExtent: 250,
         mainAxisSpacing: 20,
       ),
     );
